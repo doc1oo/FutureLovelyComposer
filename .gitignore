@@ -1,6 +1,5 @@
 build/
 !bin/gameplay.gdextension
-*.dll
 !gameplay.dll
 *.TMP
 build_release_failour/
