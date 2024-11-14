@@ -1,9 +1,0 @@
-[configuration]
-
-entry_symbol = "gdtune_library_init"
-compatibility_minimum = "4.3"
-
-[libraries]
-windows.debug.x86_64   = "res://bin/gdtune.dll"
-windows.release.x86_64   = "res://bin/gdtune.dll"
-#windows.release.x86_64   = "res://bin/gameplay.dll" "res://bin/libgdsynthesizer.windows.template_release.x86_64.dll"
