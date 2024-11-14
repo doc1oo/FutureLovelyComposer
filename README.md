@@ -1,6 +1,7 @@
 # FutureLovelyComposer
  Prototype of the next generation Lovely Composer
 
+It's a personal project for now.
 
 ## License
 一部のソースコードはclap-info、clap-hostを参考に書いており、miniaudioに関する一部のコードは公式サイトのチュートリアルから引用しています。
