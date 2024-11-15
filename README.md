@@ -12,7 +12,10 @@ It's a personal project for now. (work in progress)
 * VSCode
 * CMake
 
-## コンパイルと実行
+## 実行
+godot_project/project.godotをGodot4.3で開いてエディタ上で実行します。
+
+## コンパイル（と実行）
 * コマンドプロンプトでcd FutureLovelyComposerで移動したあと、./build.batを実行する
 * 詳細なコンパイル方法の指定はCMake(CMakelist.txt)で
 
