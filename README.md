@@ -5,6 +5,21 @@ It's a personal project for now. (work in progress)
 
 ![image](https://github.com/user-attachments/assets/d1613e6e-4de5-4771-b939-87570e299c42)
 
+## Dev tools
+* Godot 4.3
+* Visual Studio Community 2022 (『C++によるデスクトップ開発』をインストール) 17.11
+* VSCode
+* CMake
+
+## コンパイルと実行
+* コマンドプロンプトでcd FutureLovelyComposerで移動したあと、./build.batを実行する
+* 詳細なコンパイル方法の指定はCMake(CMakelist.txt)で
+
+## 説明
+今のところGodot側のプログラム（GUI中心）と、GDTuneと呼ぶ自作オーディオシステムGDExtensionに大きく分かれています。
+* GDTuneのソースコードはgdtune/とlibs/以下
+* Godot側のソースコードはgodot_project/以下
+
 ## License
 一部のソースコードはclap-info、clap-hostを参考に書いており、miniaudioに関する一部のコードは公式サイトのチュートリアルから引用しています。
 
