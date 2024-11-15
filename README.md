@@ -20,7 +20,7 @@ godot_project/project.godotをGodot4.3で開いてエディタ上で実行しま
 * 詳細なコンパイル方法の指定はCMake(CMakelist.txt)で
 
 ## 説明
-今のところGodot側のプログラム（GUI中心）と、GDTuneと呼ぶ自作オーディオシステムGDExtensionに大きく分かれています。
+今のところGodot側のプロジェクト（GUI中心/GDスクリプト）と、C++で書かれたGodotの拡張機能（GDTuneと呼ぶ自作オーディオシステムのGDExtension）に大きく分かれています。
 * GDTuneのソースコードはgdtune/とlibs/以下
 * Godot側のソースコードはgodot_project/以下
 
