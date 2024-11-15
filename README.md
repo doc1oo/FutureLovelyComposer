@@ -3,6 +3,8 @@
 
 It's a personal project for now. (work in progress)
 
+![image](https://github.com/user-attachments/assets/d1613e6e-4de5-4771-b939-87570e299c42)
+
 ## License
 一部のソースコードはclap-info、clap-hostを参考に書いており、miniaudioに関する一部のコードは公式サイトのチュートリアルから引用しています。
 
