@@ -6,6 +6,7 @@ It's a personal project for now. (work in progress)
 ![image](https://github.com/user-attachments/assets/d1613e6e-4de5-4771-b939-87570e299c42)
 
 ## Dev tools
+* Windows 11 
 * Godot 4.3
 * Visual Studio Community 2022 (『C++によるデスクトップ開発』をインストール) 17.11
 * VSCode
