@@ -20,10 +20,10 @@
 #include "RtMidi.h"
 
 #include "common.hpp"
-#include "daw_plugin_host.hpp"
+#include "audio_plugin_host.hpp"
 
 
-class DawEngine
+class DawEngine 
 {
 
 public:
@@ -37,7 +37,7 @@ public:
         kStateStopping,
     };
 
-    int init();
+    int init(std::string plugin_dir, std::string plugin_filename);
     int deinit();
     int init_audio();
     int deinit_audio();
@@ -49,6 +49,8 @@ public:
     void stop();
 
     int update(double delta);
+
+    void set_plugin_directory(std::string plugin_dir);
 
     void process_audio(const float *input, float *output, uint32_t frame_count, double stream_time);
 
@@ -75,7 +77,7 @@ public:
    
 
 private:
-    DawPluginHost daw_plugin_host;
+    AudioPluginHost audio_plugin_host;
 
     ma_context context;
     ma_device device;
@@ -91,7 +93,8 @@ private:
     int device_format = DEVICE_FORMAT;
     int min_frames_count = 32;
     int max_frames_count = 4096;
-    std::string default_clap_folder_path_str = "C:/Program Files/Common Files/CLAP/";
+    const std::string default_clap_folder_path_str = "C:/Program Files/Common Files/CLAP/";
+    std::string plugin_dir_path = "./";
     //std::string clap_file_name = "Odin2.clap";
 	int note_id = 0;
 

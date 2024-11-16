@@ -2,6 +2,8 @@
 
 #include "gdtune.hpp"
 
+#include <godot_cpp/classes/project_settings.hpp>
+
 #include <string>
 #include <fstream>
 #include <format>
@@ -28,8 +30,17 @@ namespace godot
       }
       UtilityFunctions::print("is_editor_hint() == False.");
 
+      godot::String audio_plugin_dir = godot::ProjectSettings::get_singleton()->globalize_path("res://bin/audio_plugins/");
+      std::string path_str = std::string( audio_plugin_dir.get_base_dir().utf8().get_data() ) ;
+      godot::UtilityFunctions::print(std::format("audio_plugin_dir: {}", path_str).c_str());
+      daw_engine.set_plugin_directory(path_str);
+
+      // OSクラスを使用してパスを取得(godot::Engine::get_singleton()->is_editor_hint()
+      //godot::String executable_path = godot::OS::get_singleton()->get_executable_path();
+      //godot::String godot_project_path = godot::ProjectSettings::get_singleton()->globalize_path("res://");
+
       // DAWエンジンの初期化 ---------------------------------------------------
-      daw_engine.init();
+      // daw_engine.init();
 
       // オーディオデバイスの初期化 ---------------------------------------------------
    }
@@ -46,9 +57,22 @@ namespace godot
       UtilityFunctions::print("~GDTune() start");
 
       // DAWエンジンの終了処理  ---------------------------------------------------
-      daw_engine.deinit();
+      // daw_engine.deinit();
 
       UtilityFunctions::print("~GDTune() end");
+   }
+
+   void GDTune::init(godot::String plugin_dir, godot::String plugin_filename)
+   {
+      std::string plugin_dir_str = std::string(plugin_dir.utf8().get_data());
+      std::string plugin_filename_str = std::string(plugin_filename.utf8().get_data());
+      
+      daw_engine.init(plugin_dir_str, plugin_filename_str);
+   }
+
+   void GDTune::deinit()
+   {
+      daw_engine.deinit();
    }
 
    // GDTuneノードがGodotノードメインツリーに追加された場合、60FPSとかで自動的に呼ばれる処理
@@ -122,10 +146,10 @@ namespace godot
       std::cout << "get_loaded_plugin_params_json() start " << std::endl;
 
       std::cout << daw_engine.loaded_plugin_params_json << std::endl;
-      auto json_str =Json::FastWriter().write( daw_engine.loaded_plugin_params_json);
+      auto json_str = Json::FastWriter().write(daw_engine.loaded_plugin_params_json);
       auto s2 = json_str.c_str();
       std::cout << "get_loaded_plugin_params_json: " << s2 << std::endl;
-      godot::String godot_json_str = godot::String( s2 );
+      godot::String godot_json_str = godot::String(s2);
 
       std::cout << "get_loaded_plugin_params_json() end " << std::endl;
       return godot_json_str;
@@ -135,6 +159,9 @@ namespace godot
    void GDTune::_bind_methods()
    {
       UtilityFunctions::print("Binding methods start.");
+
+      ClassDB::bind_method(D_METHOD("init", "plugin_dir", "plugin_filename"), &GDTune::init);
+      ClassDB::bind_method(D_METHOD("deinit"), &GDTune::deinit);
 
       ClassDB::bind_method(D_METHOD("get_speed"), &GDTune::get_speed);
       ClassDB::bind_method(D_METHOD("set_speed", "speed"), &GDTune::set_speed);

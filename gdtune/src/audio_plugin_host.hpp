@@ -57,12 +57,12 @@ struct CLAPInfoJsonRoot
 	}
 };
 
-class DawPluginHost
+class AudioPluginHost
 {
 
 public:
-	DawPluginHost();
-	~DawPluginHost();
+	AudioPluginHost();
+	~AudioPluginHost();
 
 	int init();
 	int deinit();

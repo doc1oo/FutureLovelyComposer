@@ -28,6 +28,7 @@
 #include <godot_cpp/core/class_db.hpp>
 #include <godot_cpp/classes/input.hpp>
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/os.hpp>
 
 #include "daw_engine.hpp"
 
@@ -92,11 +93,25 @@ namespace godot
     void play_note(int key, double length, int velocity, int channel, double delay_time);
     void param_change(godot::String name, double value, int channel, double delay_time);
     void param_change_by_id(int param_id, double value, int channel, double delay_time);
+    void init(godot::String plugin_dir, godot::String plugin_filename);
+    void deinit();
+
+    // バインディング用のメソッド群を自動生成するマクロを定義
+    /*
+    #define FORWARD_METHOD(return_type, method_name, ...) \
+        return_type method_name(__VA_ARGS__) { \
+            return daw_engine.method_name(__VA_ARGS__); \
+    }
+
+
+    FORWARD_METHOD(void, add_param_change, godot::String name, double value, int channel, double delay_time );
+    */
 
   private:
     DawEngine daw_engine;
     Vector2 m_Velocity;
 
+    
     // This will be a property later (look into _bind_methods)
     float_t m_Speed = 500.0f;
     double frequency = 440.0;

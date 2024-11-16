@@ -22,11 +22,15 @@ var thread_count = 0
 func _ready():
 	#gdtune = GDTune.new()
 	#add_child(gdtune)
+	print("Godot Current Directory: " + OS.get_executable_path().get_base_dir())
+
+	var resource_root_path = ProjectSettings.globalize_path("res://")
 
 	get_tree().set_auto_accept_quit(false)	
 	
 	mutex = Mutex.new()
 	gdtune = GDTune.new()
+	gdtune.init("","")
 	
 	gdtune.param_change("Resonance", 1.0, 0, 0.0)
 	#gdtune.param_change("Amplitude Attack (s)", 1.0, 0, 0.0)

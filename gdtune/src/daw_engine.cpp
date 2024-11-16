@@ -16,7 +16,7 @@
 double g_phase = 0;
 
 // pInputに音が入ってくるし、pOutputに音を出力する
-// プラグインの音を取ってきたかったらdaw_engineかdaw_plugin_hostのオーディオバッファを書き換えて、それをコピーするなどする？
+// プラグインの音を取ってきたかったらdaw_engineかaudio_plugin_hostのオーディオバッファを書き換えて、それをコピーするなどする？
 void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)
 { // 再生モードでは、データを pOutput にコピーします。キャプチャ モードでは、データを pInput から読み取ります。全二重モードでは、pOutput と pInput の両方が有効になり、データを pInput から pOutput に移動できます。frameCount を超えるフレームは処理しないでください。
 
@@ -117,22 +117,34 @@ DawEngine::~DawEngine()
     */
 }
 
-int DawEngine::init()
+int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
 {
     godot::UtilityFunctions::print(std::format("DawEngine::init() start").c_str());
 
+    if (plugin_dir != "") {
+        plugin_dir_path = plugin_dir;
+    }
+    if (plugin_filename != "") {
+        clap_file_name = plugin_filename;
+    }
+
     // CLAPプラグインのファイルパスを作成
     std::vector<std::filesystem::path> clap_file_pathes;
-    clap_file_pathes.push_back(std::filesystem::path(default_clap_folder_path_str + clap_file_name));
+    std::string path_str = plugin_dir_path;
+    if (!path_str.ends_with('/')) {
+        path_str += "/";
+    }
+    path_str += clap_file_name;
+    clap_file_pathes.push_back(std::filesystem::path(path_str));
 
     device_open_result = init_audio();
     init_midi();
 
-    daw_plugin_host.init();
+    audio_plugin_host.init();
 
-    daw_plugin_host.init_clap_plugin(clap_file_pathes);
+    audio_plugin_host.init_clap_plugin(clap_file_pathes);
     
-    loaded_plugin_params_json = daw_plugin_host.get_loaded_plugin_params_json();
+    loaded_plugin_params_json = audio_plugin_host.get_loaded_plugin_params_json();
 
     auto num = loaded_plugin_params_json["param-count"].asUInt();
     std::cout << loaded_plugin_params_json["param-info"].toStyledString() << std::endl;
@@ -153,9 +165,9 @@ int DawEngine::init()
     _outputs[0] = &daw_audio_output_buffer[0];
     _outputs[1] = &daw_audio_output_buffer[BUFFER_SIZE];
 
-    daw_plugin_host.set_ports(2, _inputs, 2, _outputs);
-    daw_plugin_host.plugin_activate(device_sample_rate, BUFFER_SIZE);
-    // daw_plugin_host.get_clap_info(clap_file_pathes);
+    audio_plugin_host.set_ports(2, _inputs, 2, _outputs);
+    audio_plugin_host.plugin_activate(device_sample_rate, BUFFER_SIZE);
+    // audio_plugin_host.get_clap_info(clap_file_pathes);
 
     is_processing = true;
 
@@ -424,7 +436,7 @@ int DawEngine::deinit()
     is_processing = false;
 
     godot::UtilityFunctions::print(std::format("DawEngine::deinit() start").c_str());
-    daw_plugin_host.deinit();
+    audio_plugin_host.deinit();
 
     deinit_midi();
     deinit_audio();
@@ -634,12 +646,12 @@ int DawEngine::update(double delta)
         {
 
         case MIDI_STATUS_NOTE_ON:
-            daw_plugin_host.process_note_on(sampleOffset, dawev);
+            audio_plugin_host.process_note_on(sampleOffset, dawev);
             godot::UtilityFunctions::print("MIDI_STATUS_NOTE_ON.");
             break;
 
         case MIDI_STATUS_NOTE_OFF:
-            daw_plugin_host.process_note_off(sampleOffset, dawev);
+            audio_plugin_host.process_note_off(sampleOffset, dawev);
             godot::UtilityFunctions::print("MIDI_STATUS_NOTE_OFF.");
             break;
 
@@ -690,7 +702,7 @@ void DawEngine::process_audio(const float *input, float *output, uint32_t frame_
 
     // godot::UtilityFunctions::print(std::format("DawEngine::process_audio() start").c_str() );
     /*
-     if (!daw_plugin_host || !isProcessing)
+     if (!audio_plugin_host || !isProcessing)
      {
          // プラグインが無効な場合は無音を出力
          std::fill(output, output + frameCount * 2, 0.0f);
@@ -706,13 +718,13 @@ void DawEngine::process_audio(const float *input, float *output, uint32_t frame_
     clap_audio_buffer_t out_buffer{};
     */
 
-    if (daw_plugin_host.clap_plugin)
+    if (audio_plugin_host.clap_plugin)
     {
-        daw_plugin_host.plugin_process(input, output, frame_count, stream_time);
+        audio_plugin_host.plugin_process(input, output, frame_count, stream_time);
     }
     else
     {
-        godot::UtilityFunctions::print(std::format("DawEngine:: daw_plugin_host.clap_plugin in null.").c_str());
+        godot::UtilityFunctions::print(std::format("DawEngine:: audio_plugin_host.clap_plugin in null.").c_str());
     }
 
     // in_buffer.data32 = const_cast<float **>(audio_input);
@@ -737,6 +749,11 @@ void DawEngine::process_audio(const float *input, float *output, uint32_t frame_
         }
         */
     // godot::UtilityFunctions::print(std::format("DawEngine::process_audio() end").c_str() );
+}
+
+void DawEngine::set_plugin_directory(std::string plugin_dir)
+{
+    plugin_dir_path = plugin_dir;
 }
 
 void DawEngine::play_note(int key, double length, int velocity, int channel, double delay_time)
@@ -860,7 +877,7 @@ int DawEngine::add_param_change(godot::String name, double value, int channel, d
 
 std::string DawEngine::get_clap_plugin_info()
 {
-    auto& info = daw_plugin_host.get_clap_plugin_info();
+    auto& info = audio_plugin_host.get_clap_plugin_info();
 
     std::string json_str = Json::FastWriter().write(info.root);
 
@@ -890,11 +907,11 @@ void DawEngine::extract_upcoming_events() {
             uint64_t sample_offset = ev.event_time - start_frame;
 
             if(ev.type == DAW_EVENT_NOTE_ON) {
-                daw_plugin_host.process_note_on(sample_offset, ev);
+                audio_plugin_host.process_note_on(sample_offset, ev);
             } else if(ev.type == DAW_EVENT_NOTE_OFF) {
-                daw_plugin_host.process_note_off(sample_offset, ev);
+                audio_plugin_host.process_note_off(sample_offset, ev);
             } else if(ev.type == DAW_EVENT_PARAM_CHANGE) {
-                daw_plugin_host.process_param_change(sample_offset, ev);
+                audio_plugin_host.process_param_change(sample_offset, ev);
             }
            // _daw_events.erase(_daw_events.begin() + i);
            ev.erace_flag = true;
