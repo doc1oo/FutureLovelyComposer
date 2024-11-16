@@ -1,7 +1,28 @@
 # FutureLovelyComposer
  Prototype of the next generation Lovely Composer
 
-It's a personal project for now.
+It's a personal project for now. (work in progress)
+
+![image](https://github.com/user-attachments/assets/d1613e6e-4de5-4771-b939-87570e299c42)
+
+## Dev tools
+* Windows 11 
+* Godot 4.3
+* Visual Studio Community 2022 (『C++によるデスクトップ開発』をインストール) 17.11
+* VSCode
+* CMake
+
+## 実行
+godot_project/project.godotをGodot4.3で開いてエディタ上で実行します。
+
+## コンパイル（と実行）
+* コマンドプロンプトでcd FutureLovelyComposerで移動したあと、./build.batを実行する
+* 詳細なコンパイル方法の指定はCMake(CMakelist.txt)で
+
+## 説明
+今のところGodot側のプロジェクト（GUI中心/GDスクリプト）と、C++で書かれたGodotの拡張機能（GDTuneと呼ぶ自作オーディオシステムのGDExtension）に大きく分かれています。
+* GDTuneのソースコードはgdtune/とlibs/以下
+* Godot側のソースコードはgodot_project/以下
 
 ## License
 一部のソースコードはclap-info、clap-hostを参考に書いており、miniaudioに関する一部のコードは公式サイトのチュートリアルから引用しています。
