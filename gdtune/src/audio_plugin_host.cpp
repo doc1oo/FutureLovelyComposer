@@ -616,6 +616,11 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
     //godot::UtilityFunctions::print( std::format("DawPluginHost::process_note_on() start: {} {} {} {}", sample_offset, channel, key, velocity).c_str() );
     // checkForAudioThread();
 
+/*
+    公式ではどちらかというとCLAP_EVENT_NOTE_推奨らしい
+    ノート イベントを送信する推奨方法は、CLAP_EVENT_NOTE_* を使用することです。
+    The preferred way of sending a note event is to use CLAP_EVENT_NOTE_*.
+
     clap_event_midi midiev;
     // midi note on 144,64,90
     midiev.data[0] = 0x90 + 0;       //0x9xがノートオン
@@ -627,10 +632,12 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
     midiev.header.time = sample_offset;//daw_ev.event_time;
     midiev.header.flags = 0;
     midiev.header.size = sizeof(midiev);
-    
-/*
 
     _event_in.push(&midiev.header);
+
+    _event_in.push(&midiev.header);
+*/
+
     
 
     clap_event_note ev;
@@ -640,12 +647,12 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
     ev.header.flags = 0;
     ev.header.size = sizeof(ev);
     ev.port_index = 0;
-    ev.key = key;
-    ev.channel = channel;
+    ev.key = daw_ev.key;
+    ev.channel = daw_ev.channel;
     ev.note_id = note_id;         // -1はダメらしい。0以上のインクリメントされたユニークを入れる
-    ev.velocity = velocity / 127.0;*/
+    ev.velocity = daw_ev.velocity / 127.0;
 
-    _event_in.push(&midiev.header);
+    _event_in.push(&ev.header);
 
     note_id++;
 
@@ -660,6 +667,10 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
 
     // checkForAudioThread();
 
+/*
+    公式ではどちらかというとCLAP_EVENT_NOTE_推奨らしい
+    ノート イベントを送信する推奨方法は、CLAP_EVENT_NOTE_* を使用することです。
+    The preferred way of sending a note event is to use CLAP_EVENT_NOTE_*.
     clap_event_midi midiev;
     
     midiev.data[0] = 0x80 + 0;       //0x8xがノートオフ
@@ -672,8 +683,8 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
     midiev.header.flags = 0;
     midiev.header.size = sizeof(midiev);
     _event_in.push(&midiev.header);
+    */
 
-    /*
     clap_event_note ev;
     ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
     ev.header.type = CLAP_EVENT_NOTE_OFF;
@@ -687,7 +698,6 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
     ev.velocity = daw_ev.velocity / 127.0;
 
     _event_in.push(&ev.header);
-    */
 
     note_id++;
 
