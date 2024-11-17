@@ -162,6 +162,7 @@ namespace godot
 
       ClassDB::bind_method(D_METHOD("init", "plugin_dir", "plugin_filename"), &GDTune::init);
       ClassDB::bind_method(D_METHOD("deinit"), &GDTune::deinit);
+      ClassDB::bind_method(D_METHOD("update", "delta"), &GDTune::update);
 
       ClassDB::bind_method(D_METHOD("get_speed"), &GDTune::get_speed);
       ClassDB::bind_method(D_METHOD("set_speed", "speed"), &GDTune::set_speed);
@@ -171,7 +172,6 @@ namespace godot
       ClassDB::bind_method(D_METHOD("get_instruments_info"), &GDTune::get_instruments_info);
       ClassDB::bind_method(D_METHOD("get_loaded_plugin_params_json"), &GDTune::get_loaded_plugin_params_json);
 
-      ClassDB::bind_method(D_METHOD("update", "delta"), &GDTune::update);
       ClassDB::bind_method(D_METHOD("play_note", "key", "length", "velocity", "channel", "delay_time"), &GDTune::play_note);
       ClassDB::bind_method(D_METHOD("param_change", "name", "value", "channel", "delay_time"), &GDTune::param_change);
       ClassDB::bind_method(D_METHOD("param_change_by_id", "param_id", "value", "channel", "delay_time"), &GDTune::param_change_by_id);
@@ -183,110 +183,3 @@ namespace godot
    }
 
 }
-
-/*
-void PluginHost::process() {
-   checkForAudioThread();
-
-   if (!_plugin)
-      return;
-
-   // Can't process a plugin that is not active
-   if (!isPluginActive())
-      return;
-
-   // Do we want to deactivate the plugin?
-   if (_scheduleDeactivate) {
-      _scheduleDeactivate = false;
-      if (_state == ActiveAndProcessing)
-         _plugin->stop_processing(_plugin);
-      setPluginState(ActiveAndReadyToDeactivate);
-      return;
-   }
-
-   // We can't process a plugin which failed to start processing
-   if (_state == ActiveWithError)
-      return;
-
-   _process.transport = nullptr;
-
-   _process.in_events = _evIn.clapInputEvents();
-   _process.out_events = _evOut.clapOutputEvents();
-
-   _process.audio_inputs = &_audioIn;
-   _process.audio_inputs_count = 1;
-   _process.audio_outputs = &_audioOut;
-   _process.audio_outputs_count = 1;
-
-   _evOut.clear();
-   generatePluginInputEvents();
-
-   if (isPluginSleeping()) {
-      if (!_scheduleProcess && _evIn.empty())
-         // The plugin is sleeping, there is no request to wake it up and there are no events to
-         // process
-         return;
-
-      _scheduleProcess = false;
-      if (!_plugin->start_processing(_plugin)) {
-         // the plugin failed to start processing
-         setPluginState(ActiveWithError);
-         return;
-      }
-
-      setPluginState(ActiveAndProcessing);
-   }
-
-   int32_t status = CLAP_PROCESS_SLEEP;
-   if (isPluginProcessing())
-      status = _plugin->process(_plugin, &_process);
-
-   handlePluginOutputEvents();
-
-   _evOut.clear();
-   _evIn.clear();
-
-   _engineToAppValueQueue.producerDone();
-
-   // TODO: send plugin to sleep if possible
-
-   g_thread_type = ThreadType::Unknown;
-}
-*/
-
-/*
-
-
-
-int main() {
-    MinimalClapHost host;
-
-    // オーディオデバイスの初期化
-    if (!host.initAudio()) {
-        std::cerr << "Failed to initialize audio" << std::endl;
-        return 1;
-    }
-
-    // プラグインのロード
-    if (!host.loadPlugin("path/to/your/plugin.clap")) {
-        std::cerr << "Failed to load plugin" << std::endl;
-        return 1;
-    }
-
-    // オーディオ処理の開始
-    if (!host.start()) {
-        std::cerr << "Failed to start audio processing" << std::endl;
-        return 1;
-    }
-
-    std::cout << "Playing audio... Press Enter to stop." << std::endl;
-    std::cin.get();
-
-    // 終了処理
-    host.stop();
-
-    return 0;
-}
-
-
-*/
