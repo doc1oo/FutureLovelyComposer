@@ -638,9 +638,8 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
     _event_in.push(&midiev.header);
 */
 
-    
 
-    clap_event_note ev;
+    clap_event_note ev{};
     ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
     ev.header.type = CLAP_EVENT_NOTE_ON;
     ev.header.time = sample_offset;
@@ -685,7 +684,7 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
     _event_in.push(&midiev.header);
     */
 
-    clap_event_note ev;
+    clap_event_note ev{};
     ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
     ev.header.type = CLAP_EVENT_NOTE_OFF;
     ev.header.time = sample_offset;
@@ -699,7 +698,7 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
 
     _event_in.push(&ev.header);
 
-    note_id++;
+    //note_id++;
 
     godot::UtilityFunctions::print("DawPluginHost::process_note_off() end");
     return 0;
@@ -712,7 +711,7 @@ int AudioPluginHost::process_param_change(int sample_offset, daw_event_t &event)
     auto& daw_ev = event;
     //CLAP_EVENT_PARAM_VALUE:
     
-    clap_event_param_value_t ev;
+    clap_event_param_value_t ev{};
     ev.header.space_id = CLAP_CORE_EVENT_SPACE_ID;
     ev.header.type = CLAP_EVENT_PARAM_VALUE;
     ev.header.time = sample_offset;
