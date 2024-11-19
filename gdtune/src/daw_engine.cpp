@@ -25,10 +25,10 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
     if (daw_engine->is_processing)
     {
         // フレーム数から時間を計算
-        //double streamTime = pDevice->playback.proc.currentFrame / (double)pDevice->sampleRate;
+        // double streamTime = pDevice->playback.proc.currentFrame / (double)pDevice->sampleRate;
 
-        //double streamTime = timeInFrames / (double)pDevice->sampleRate;
- 
+        // double streamTime = timeInFrames / (double)pDevice->sampleRate;
+
         double streamTime = daw_engine->total_frames_processed / (double)pDevice->sampleRate;
 
         daw_engine->extract_upcoming_events();
@@ -121,17 +121,20 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
 {
     godot::UtilityFunctions::print(std::format("DawEngine::init() start").c_str());
 
-    if (plugin_dir != "") {
+    if (plugin_dir != "")
+    {
         plugin_dir_path = plugin_dir;
     }
-    if (plugin_filename != "") {
+    if (plugin_filename != "")
+    {
         clap_file_name = plugin_filename;
     }
 
     // CLAPプラグインのファイルパスを作成
     std::vector<std::filesystem::path> clap_file_pathes;
     std::string path_str = plugin_dir_path;
-    if (!path_str.ends_with('/')) {
+    if (!path_str.ends_with('/'))
+    {
         path_str += "/";
     }
     path_str += clap_file_name;
@@ -143,7 +146,7 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
     audio_plugin_host.init();
 
     audio_plugin_host.init_clap_plugin(clap_file_pathes);
-    
+
     loaded_plugin_params_json = audio_plugin_host.get_loaded_plugin_params_json();
 
     auto num = loaded_plugin_params_json["param-count"].asUInt();
@@ -151,13 +154,13 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
 
     godot::UtilityFunctions::print(std::format("Plugin parameter num: {}", num).c_str());
     godot::UtilityFunctions::print(std::format("Plugin parameters ----------").c_str());
-    for(int i=0; i<num; i++) {
-        auto& prm = loaded_plugin_params_json["param-info"][i];
-        //auto& root = json["root"];
-        //json["param-info"][i]["name"];
-        
-        godot::UtilityFunctions::print(std::format("[{}] ... current={} default={} min={} max={}", prm["name"].asString(), prm["values"]["current"].asString(),prm["values"]["default"].asString(), prm["values"]["min"].asString(), prm["values"]["max"].asString()).c_str());
-        
+    for (int i = 0; i < num; i++)
+    {
+        auto &prm = loaded_plugin_params_json["param-info"][i];
+        // auto& root = json["root"];
+        // json["param-info"][i]["name"];
+
+        godot::UtilityFunctions::print(std::format("[{}] ... current={} default={} min={} max={}", prm["name"].asString(), prm["values"]["current"].asString(), prm["values"]["default"].asString(), prm["values"]["min"].asString(), prm["values"]["max"].asString()).c_str());
     }
 
     _inputs[0] = &daw_audio_input_buffer[0];
@@ -635,7 +638,6 @@ int DawEngine::update(double delta)
 
         godot::UtilityFunctions::print(std::format("DawEngine::update() {},{},{},{}", sampleOffset, channel, data1, data2).c_str());
 
-
         daw_event_t dawev;
         dawev.event_time = sampleOffset;
         dawev.channel = channel;
@@ -758,13 +760,15 @@ void DawEngine::set_plugin_directory(std::string plugin_dir)
 
 void DawEngine::play_note(int key, double length, int velocity, int channel, double delay_time)
 {
+    godot::UtilityFunctions::print("DawEngine::play_note(() start");
+
     if (!is_processing)
     {
         return;
     }
 
-    uint64_t start_frame =  total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
-    uint64_t end_frame =  start_frame + int64_t(length * SAMPLE_RATE);
+    uint64_t start_frame = total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
+    uint64_t end_frame = start_frame + int64_t(length * SAMPLE_RATE);
     std::cout << "start_frame: " << start_frame << std::endl;
     std::cout << "end_frame: " << end_frame << std::endl;
 
@@ -772,8 +776,8 @@ void DawEngine::play_note(int key, double length, int velocity, int channel, dou
     add_note_off(end_frame, key, velocity, channel);
     note_id++;
 
+    godot::UtilityFunctions::print("DawEngine::play_note(() end");
 }
-
 
 int DawEngine::add_note_on(uint64_t event_time, int key, int velocity, int channel)
 {
@@ -786,6 +790,7 @@ int DawEngine::add_note_on(uint64_t event_time, int key, int velocity, int chann
     ev.key = key;
     ev.velocity = velocity;
     ev.note_id = note_id;
+    ev.channel = 0;
 
     _daw_events.push_back(ev);
 
@@ -804,6 +809,7 @@ int DawEngine::add_note_off(uint64_t event_time, int key, int velocity, int chan
     ev.key = key;
     ev.velocity = velocity;
     ev.note_id = note_id;
+    ev.channel = 0;
 
     _daw_events.push_back(ev);
 
@@ -811,13 +817,12 @@ int DawEngine::add_note_off(uint64_t event_time, int key, int velocity, int chan
     return 0;
 }
 
-
-int DawEngine::add_param_change_by_id(int param_id, double value, int channel, double delay_time) {
+int DawEngine::add_param_change_by_id(int param_id, double value, int channel, double delay_time)
+{
     godot::UtilityFunctions::print("DawEngine::add_param_change_by_id() start");
 
-    uint64_t start_frame =  total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
+    uint64_t start_frame = total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
 
-    godot::UtilityFunctions::print("DawEngine::add_note_off() start");
     // checkForAudioThread();
 
     daw_event_t ev;
@@ -826,8 +831,8 @@ int DawEngine::add_param_change_by_id(int param_id, double value, int channel, d
     ev.channel = channel;
     ev.param_value = value;
     ev.param_id = param_id;
-    //ev.key = key;
-    //ev.note_id = note_id;
+    // ev.key = key;
+    // ev.note_id = note_id;
 
     _daw_events.push_back(ev);
 
@@ -842,29 +847,35 @@ int DawEngine::add_param_change(godot::String name, double value, int channel, d
 
     int param_id = -1;
     auto num = loaded_plugin_params_json["param-count"].asUInt();
-    for(int i=0; i<num; i++) {
-        auto& prm = loaded_plugin_params_json["param-info"][i];
-        //std::cout << "cstr: " << cstring_name << " prmname:" << prm["name"].asString() << std::endl;
-        if (strcmp(cstring_name.c_str(), prm["name"].asString().c_str()) == 0) {     // 0: equal
-            //auto& root = json["root"];
-            try {
+    for (int i = 0; i < num; i++)
+    {
+        auto &prm = loaded_plugin_params_json["param-info"][i];
+        // std::cout << "cstr: " << cstring_name << " prmname:" << prm["name"].asString() << std::endl;
+        if (strcmp(cstring_name.c_str(), prm["name"].asString().c_str()) == 0)
+        { // 0: equal
+            // auto& root = json["root"];
+            try
+            {
                 std::cout << prm["id"] << std::endl;
                 param_id = prm["id"].asInt();
-            } catch (std::exception& e) {
+            }
+            catch (std::exception &e)
+            {
                 std::cout << "Exception: " << e.what() << std::endl;
                 godot::UtilityFunctions::print("Exception.");
                 return -1;
             }
-            
-            //godot::UtilityFunctions::print(std::format("[{}] ... current={} default={} min={} max={}", prm["name"].asString(), prm["values"]["current"].asString(),prm["values"]["default"].asString(), prm["values"]["min"].asString(), prm["values"]["max"].asString()).c_str());
+
+            // godot::UtilityFunctions::print(std::format("[{}] ... current={} default={} min={} max={}", prm["name"].asString(), prm["values"]["current"].asString(),prm["values"]["default"].asString(), prm["values"]["min"].asString(), prm["values"]["max"].asString()).c_str());
             break;
         }
     }
 
     std::cout << "param_id: " << param_id << std::endl;
 
-    if (param_id == -1) {
-        godot::UtilityFunctions::print( std::format("param_id not found.: {}", param_id).c_str() );
+    if (param_id == -1)
+    {
+        godot::UtilityFunctions::print(std::format("param_id not found.: {}", param_id).c_str());
         return -1;
     }
     godot::UtilityFunctions::print("param_id found. {}");
@@ -877,7 +888,7 @@ int DawEngine::add_param_change(godot::String name, double value, int channel, d
 
 std::string DawEngine::get_clap_plugin_info()
 {
-    auto& info = audio_plugin_host.get_clap_plugin_info();
+    auto &info = audio_plugin_host.get_clap_plugin_info();
 
     std::string json_str = Json::FastWriter().write(info.root);
 
@@ -886,40 +897,67 @@ std::string DawEngine::get_clap_plugin_info()
 
     // Godot側で JSON.parse() を使用して変換
     // GDScriptなど
-    //var data = JSON.parse(godot_json_str);
-    
+    // var data = JSON.parse(godot_json_str);
+
     godot::UtilityFunctions::print("get_clap_plugin_info() end");
 
     return json_str;
 }
 
-void DawEngine::extract_upcoming_events() {
-    //godot::UtilityFunctions::print("extract_upcoming_events() start");
+void DawEngine::extract_upcoming_events()
+{
+    // godot::UtilityFunctions::print("extract_upcoming_events() start");
 
     uint64_t start_frame = total_frames_processed;
     uint64_t end_frame = start_frame + BUFFER_SIZE - 1;
 
-    for(int i=0; i < _daw_events.size(); i++) {
+    // 新しいベクター
+    std::vector<daw_event_t> target_events;
 
-        auto& ev = _daw_events[i];
-
-        if (ev.event_time >= start_frame && ev.event_time < end_frame) {
-            uint64_t sample_offset = ev.event_time - start_frame;
-
-            if(ev.type == DAW_EVENT_NOTE_ON) {
-                audio_plugin_host.process_note_on(sample_offset, ev);
-            } else if(ev.type == DAW_EVENT_NOTE_OFF) {
-                audio_plugin_host.process_note_off(sample_offset, ev);
-            } else if(ev.type == DAW_EVENT_PARAM_CHANGE) {
-                audio_plugin_host.process_param_change(sample_offset, ev);
-            }
-           // _daw_events.erase(_daw_events.begin() + i);
-           ev.erace_flag = true;
+    // 処理対象の要素を抽出
+    for (int i = 0; i < _daw_events.size(); i++)
+    {
+        auto &ev = _daw_events[i];
+        if (ev.event_time >= start_frame && ev.event_time < end_frame)
+        {
+            target_events.push_back(ev);
+            _daw_events[i].erace_flag = true;
         }
-
     }
 
-    std::erase_if(_daw_events, [](daw_event_t ev) { return ev.erace_flag; });
+    // 要素を時間順でソートする（不正確な暫定処置）
+    std::sort(target_events.begin(), target_events.end(),
+              [](const daw_event_t &a, const daw_event_t &b)
+              {
+                  return a.event_time < b.event_time; // 昇順
+              });
 
-    //godot::UtilityFunctions::print("extract_upcoming_events() end");
+    for (int i = 0; i < target_events.size(); i++)
+    {
+
+        auto &ev = target_events[i];
+
+        uint64_t sample_offset = ev.event_time - start_frame;
+
+        auto frames = audio_plugin_host.clap_process.frames_count;
+        godot::UtilityFunctions::print(std::format("audio_plugin_host.clap_process.frames_count start: {}", frames).c_str());
+
+        if (ev.type == DAW_EVENT_NOTE_ON)
+        {
+            audio_plugin_host.process_note_on(sample_offset, ev);
+        }
+        else if (ev.type == DAW_EVENT_NOTE_OFF)
+        {
+            audio_plugin_host.process_note_off(sample_offset, ev);
+        }
+        else if (ev.type == DAW_EVENT_PARAM_CHANGE)
+        {
+            audio_plugin_host.process_param_change(sample_offset, ev);
+        }
+    }
+
+    std::erase_if(_daw_events, [](daw_event_t ev)
+                  { return ev.erace_flag; });
+
+    // godot::UtilityFunctions::print("extract_upcoming_events() end");
 }
