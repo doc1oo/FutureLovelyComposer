@@ -613,7 +613,7 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
 {
     auto& daw_ev = event;
 
-    //godot::UtilityFunctions::print( std::format("DawPluginHost::process_note_on() start: {} {} {} {}", sample_offset, channel, key, velocity).c_str() );
+    godot::UtilityFunctions::print( std::format("DawPluginHost::process_note_on() start: {} {} {} {}", sample_offset, event.channel, event.key, event.velocity).c_str() );
     // checkForAudioThread();
 
 /*
@@ -661,6 +661,8 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
 
 int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
 {
+    godot::UtilityFunctions::print( std::format("DawPluginHost::process_note_off() start: {} {} {} {}", sample_offset, event.channel, event.key, event.velocity).c_str() );
+
     auto& daw_ev = event;
     //godot::UtilityFunctions::print( std::format("DawPluginHost::process_note_off() start: {} {} {} {}", sample_offset, channel, key, velocity).c_str() );
 
