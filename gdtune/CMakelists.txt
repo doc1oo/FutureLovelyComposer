@@ -1,6 +1,7 @@
 project(gdtune)
 
 #set(RTMIDI_API_WINMM ON)
+add_compile_options(/utf-8)
 
 #add_definitions(-DRTMIDI_API_WINMM=ON)
 add_definitions(-D__WINDOWS_MM__ -DRTMIDI_DEBUG)
@@ -29,6 +30,8 @@ PRIVATE
 "${CMAKE_CURRENT_SOURCE_DIR}/../libs/clap-1.2.2/include/"
 "${CMAKE_CURRENT_SOURCE_DIR}/../libs/clap-helpers/include/"
 "${CMAKE_CURRENT_SOURCE_DIR}/../libs/jsoncpp/include/"
+"${CMAKE_CURRENT_SOURCE_DIR}/../libs/spdlog-1.x/include/"
+
 )
 
 #"target_compile_options(jsoncpp PRIVATE $<$<CXX_COMPILER_ID:GNU>:-Wno-deprecated-declarations>)
@@ -43,6 +46,8 @@ PRIVATE
     godot::cpp
     winmm
     "${CMAKE_CURRENT_SOURCE_DIR}/../libs/jsoncpp_static.lib"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../libs/spdlogd.lib"
+    #spdlog::spdlog_static
 #    "${CMAKE_CURRENT_SOURCE_DIR}/../rtmidi-6.0.0/build/Debug/rtmidi.lib"
 )
 

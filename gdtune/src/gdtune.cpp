@@ -1,5 +1,6 @@
 #define NOMINMAX // clap-helperのmin/maxエラー対策
 
+#include "common.hpp"
 #include "gdtune.hpp"
 
 #include <godot_cpp/classes/project_settings.hpp>
@@ -17,6 +18,12 @@ namespace godot
    // GDExtentionのコンストラクタ
    GDTune::GDTune()
    {
+      spdlog::set_level(spdlog::level::trace);
+      spdlog::info("spdlog/ GDTune() Construct start!");
+
+      auto console = spdlog::stdout_color_mt("console");
+      #define LOG_FUNC(console) console->info(__FUNCTION__)
+
       UtilityFunctions::print("-----------------------------------------------");
       UtilityFunctions::print("GDTune() Construct start!");
       // time_passed = 0;
@@ -86,8 +93,11 @@ namespace godot
    // 60Hzを超えて可能な限り高速にくりかえし呼んで欲しい更新処理
    void GDTune::update(double_t delta)
    {
+      spdlog::trace("{}() start", __FUNCTION__);
 
       daw_engine.update(0.0);
+
+      spdlog::trace("{}() end", __FUNCTION__);
    }
 
    void GDTune::play_note(int key, double length, int velocity, int channel, double delay_time)

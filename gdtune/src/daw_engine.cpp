@@ -588,13 +588,15 @@ int DawEngine::update(double delta)
 
     // tone_generator.setFrequency(frequency);
 
-    int nBytes, i;
+    int nBytes;
     double time_stamp;
 
     // Periodically check input queue.
     std::vector<unsigned char> receive_mes;
     std::vector<unsigned char> send_mes;
     // std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
+
+    double base_time = 0.0;
 
     while (time_stamp = midiin->getMessage(&receive_mes))
     {
@@ -606,7 +608,7 @@ int DawEngine::update(double delta)
 
         // To Midi-Out ----------------------------------------------
         send_mes.clear();
-        for (i = 0; i < nBytes; i++)
+        for (int i = 0; i < nBytes; i++)
         {
             // std::cout << "Byte" << i << "=" << (int)message[i] << ", ";
             send_mes.push_back(receive_mes[i]);
@@ -615,7 +617,7 @@ int DawEngine::update(double delta)
 
         if (nBytes > 0)
         {
-            // std::cout << "time_stamp=" << time_stamp << std::endl;
+            std::cout << "time_stamp=" << time_stamp << std::endl;
         }
 
         // To CLAP Plugin ----------------------------------------------
@@ -629,12 +631,10 @@ int DawEngine::update(double delta)
         // double deltaMs = currentTime - time_stamp;
         double deltaSample = (delta * device_sample_rate) / 1000;
 
-        // if (deltaSample >= frame_count)
-        //	deltaSample = frame_count - 1;
-
-        int frame_count = 100; // 一時的にエラーを回避するための仮の値
-
-        int32_t sampleOffset = 0; // frame_count - deltaSample;
+        int32_t sampleOffset = base_time * SAMPLE_RATE; // frame_count - deltaSample;
+        if (sampleOffset > BUFFER_SIZE) {
+            sampleOffset = BUFFER_SIZE - 1;
+        }
 
         godot::UtilityFunctions::print(std::format("DawEngine::update() {},{},{},{}", sampleOffset, channel, data1, data2).c_str());
 
@@ -648,8 +648,13 @@ int DawEngine::update(double delta)
         {
 
         case MIDI_STATUS_NOTE_ON:
-            audio_plugin_host.process_note_on(sampleOffset, dawev);
-            godot::UtilityFunctions::print("MIDI_STATUS_NOTE_ON.");
+            if (dawev.velocity > 0) {
+                audio_plugin_host.process_note_on(sampleOffset, dawev);
+                godot::UtilityFunctions::print("MIDI_STATUS_NOTE_ON.");
+            } else {
+                audio_plugin_host.process_note_off(sampleOffset, dawev);
+                godot::UtilityFunctions::print("Velocity MIDI_STATUS_NOTE_ON received but system send note off.");
+            }
             break;
 
         case MIDI_STATUS_NOTE_OFF:
@@ -665,6 +670,8 @@ int DawEngine::update(double delta)
             std::cerr << "unknown event type: " << (int)eventType << std::endl;
             break;
         }
+
+        base_time = time_stamp;
     }
 
     // printf("test %f\n", delta);

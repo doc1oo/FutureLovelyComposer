@@ -2,6 +2,9 @@
 
 #include <cstdint>  // uint64_tのために必要
 
+#include "spdlog/spdlog.h"
+#include "spdlog/sinks/stdout_color_sinks.h"
+
 #define DEVICE_FORMAT ma_format_f32
 #define DEVICE_CHANNELS 2
 #define DEVICE_SAMPLE_RATE 48000

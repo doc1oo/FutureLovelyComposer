@@ -38,3 +38,4 @@ godot_project/project.godotをGodot4.3で開いてエディタ上で実行しま
 * [jsoncpp](https://github.com/open-source-parsers/jsoncpp) 
 * [miniaudio](https://github.com/mackron/miniaudio)
 * [RtMidi](https://github.com/thestk/rtmidi)
+* [spdlog](https://github.com/gabime/spdlog)
