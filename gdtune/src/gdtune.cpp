@@ -22,8 +22,7 @@ namespace godot
       spdlog::info("spdlog/ GDTune() Construct start!");
 
       auto console = spdlog::stdout_color_mt("console");
-      #define LOG_FUNC(console) console->info(__FUNCTION__)
-
+      spdlog::set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
 
       UtilityFunctions::print("-----------------------------------------------");
       UtilityFunctions::print("GDTune() Construct start!");
@@ -39,13 +38,13 @@ namespace godot
       UtilityFunctions::print("is_editor_hint() == False.");
 
       godot::String audio_plugin_dir = godot::ProjectSettings::get_singleton()->globalize_path("res://bin/audio_plugins/");
-      std::string path_str = std::string( audio_plugin_dir.get_base_dir().utf8().get_data() ) ;
+      std::string path_str = std::string(audio_plugin_dir.get_base_dir().utf8().get_data());
       godot::UtilityFunctions::print(std::format("audio_plugin_dir: {}", path_str).c_str());
       daw_engine.set_plugin_directory(path_str);
 
       // OSクラスを使用してパスを取得(godot::Engine::get_singleton()->is_editor_hint()
-      //godot::String executable_path = godot::OS::get_singleton()->get_executable_path();
-      //godot::String godot_project_path = godot::ProjectSettings::get_singleton()->globalize_path("res://");
+      // godot::String executable_path = godot::OS::get_singleton()->get_executable_path();
+      // godot::String godot_project_path = godot::ProjectSettings::get_singleton()->globalize_path("res://");
 
       // DAWエンジンの初期化 ---------------------------------------------------
       // daw_engine.init();
@@ -69,6 +68,7 @@ namespace godot
       // daw_engine.deinit();
 
       UtilityFunctions::print("~GDTune() end");
+      LOG_FUNC_END();
    }
 
    void GDTune::init(godot::String plugin_dir, godot::String plugin_filename)
@@ -76,8 +76,9 @@ namespace godot
       LOG_FUNC_START();
       std::string plugin_dir_str = std::string(plugin_dir.utf8().get_data());
       std::string plugin_filename_str = std::string(plugin_filename.utf8().get_data());
-      
+
       daw_engine.init(plugin_dir_str, plugin_filename_str);
+      LOG_FUNC_END();
    }
 
    void GDTune::deinit()
@@ -97,7 +98,7 @@ namespace godot
    // 60Hzを超えて可能な限り高速にくりかえし呼んで欲しい更新処理
    void GDTune::update(double_t delta)
    {
-      //spdlog::trace(__FUNCTION__);
+      // spdlog::trace(__FUNCTION__);
       LOG_FUNC_START();
 
       daw_engine.update(0.0);

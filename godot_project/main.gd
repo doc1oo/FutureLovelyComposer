@@ -19,6 +19,7 @@ var frequency = 440
 #call_deferred("add_child", gdtune)
 var thread_count = 0
 
+
 func _ready():
 	#gdtune = GDTune.new()
 	#add_child(gdtune)
@@ -30,7 +31,8 @@ func _ready():
 	
 	mutex = Mutex.new()
 	gdtune = GDTune.new()
-	gdtune.init("","")
+	#gdtune.init("","")
+	gdtune.init("C:/Program Files/Common Files/CLAP/","my_clap-saw-demo-imgui.clap")
 	
 	gdtune.param_change("Resonance", 1.0, 0, 0.0)
 	#gdtune.param_change("Amplitude Attack (s)", 1.0, 0, 0.0)
@@ -142,7 +144,8 @@ func _ready():
 	
 	thread.start(audio_thread, Thread.PRIORITY_HIGH)
 	pass
-	
+
+
 func  _process(delta: float) -> void:
 	var m_pos = get_global_mouse_position()
 	var lm_pos =  get_local_mouse_position()
@@ -165,7 +168,7 @@ func _input(event):
 				frequency = 1000 - m_pos.y
 				var note_key = frequency / 50 + 60
 				print("play_note:" + str(note_key))
-				gdtune.play_note(note_key, 1.5, 100, 0, 0.0)
+				gdtune.play_note(note_key, 1.0, 100, 0, 0.0)
 		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 			print("右クリックされました")
 			
@@ -189,50 +192,43 @@ func _notification(what: int) -> void:
 		# ↓ここを好きな処理に置き換え
 		quit_game()
 
+
 # アプリ終了処理時に自動的に呼ばれるシステム関数（get_tree().quit()の後など）
 func _exit_tree():
-	print("_exit_tree() start")
+	print("main.gd: _exit_tree() start")
 	app_running = false
+	
+	# Godotの別スレッドを終了
 	if thread.is_alive():
-		print("thread.wait_to_finish() start")
+		print("main.gd: thread.wait_to_finish() start")
 		thread.wait_to_finish()
-		print("thread.wait_to_finish() finished")
+		print("main.gd: thread.wait_to_finish() finished")
 	else:
-		print("thread is not alive.")
-	
-	if gdtune:
-		print("gdtune.queue_free() start")
-		#gdtune.queue_free()  # または custom_node.free()
-		gdtune.free()
-		print("gdtune.queue_free() end")
-	#thread.wait_to_finish()
-	#get_tree().quit()		# 手動で終了処理をしないと閉じれない
-	
-func quit_game():
-	print("Quitting app start.")
+		print("main.gd: thread is not alive.")
 
-	"""	
-	print("_exit_tree() start")
-	app_running = false
-	if thread.is_alive():
-		print("スレッド終了要求")
-		thread.wait_to_finish()
-		print("スレッド終了")
-	
+	# GDTuneを解放	
 	if gdtune:
-		gdtune.queue_free()  # または custom_node.free()
-		print("gdtune queue_free() end")
-	"""
-	#thread.wait_to_finish()
+		print("main.gd: gdtune.queue_free() start")
+		#gdtune.queue_free()  # または custom_node.free()
+		gdtune.deinit()
+		gdtune.free()
+		print("main.gd: gdtune.queue_free() end")
+
+
+func quit_game():
+	print("main.gd: Quitting app start.")
+
 	#game_data["player_name"] = $HUD/PlayerName.text
 	#write_save_data()
-	print("get_tree().quit() start")
+	print("main.gd: get_tree().quit() start")
 	get_tree().quit()		# 手動で終了処理をしないと閉じれない 
-	print("get_tree().quit() finished.")
+	print("main.gd: get_tree().quit() finished.")
 	# _exit_tree() startがこの後呼ばれます
 
+
 func on_button_down():
-	print("On Button Down!")	
+	print("main.gd: On Button Down!")	
+
 
 func audio_thread():
 	
@@ -358,7 +354,7 @@ func _process(delta):
 
 
 func _on_h_slider_value_changed(value: float, slider: HSlider) -> void:
-	print("_on_h_slider_value_changed(): ", value, " ", slider.get_meta("param_name"), " ",  slider.get_meta("param_id"))
+	print("main.gd: _on_h_slider_value_changed(): ", value, " ", slider.get_meta("param_name"), " ",  slider.get_meta("param_id"))
 	var param_id = slider.get_meta("param_id")
 	get_node("plugin_params_value_label_" + str(param_id)).text = str(value)
 	

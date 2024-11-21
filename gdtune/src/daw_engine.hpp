@@ -104,8 +104,11 @@ private:
     std::string clap_file_name = "clap-saw-demo-imgui.clap";
     //std::string clap_file_name = "Surge Synth Team/Surge XT.clap";// "Dexed.clap"; //"Odin2.clap";
 
+    bool is_initialized = false;
     bool is_input_init_success = true;
     bool is_output_init_success = true;
+    bool is_audio_init_success = false;
+    bool is_midi_init_success = false;
 
     //const float* inputs[2];
     //float* outputs[2];

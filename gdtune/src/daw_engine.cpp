@@ -20,6 +20,8 @@ double g_phase = 0;
 void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount)
 { // 再生モードでは、データを pOutput にコピーします。キャプチャ モードでは、データを pInput から読み取ります。全二重モードでは、pOutput と pInput の両方が有効になり、データを pInput から pOutput に移動できます。frameCount を超えるフレームは処理しないでください。
 
+    LOG_FUNC_START();
+
     auto daw_engine = static_cast<DawEngine *>(pDevice->pUserData);
 
     if (daw_engine->is_processing)
@@ -48,6 +50,7 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
     }
 
     daw_engine->total_frames_processed += frameCount;
+    LOG_FUNC_END();
 }
 
 /*
@@ -105,6 +108,11 @@ DawEngine::DawEngine() : is_processing(false)
 DawEngine::~DawEngine()
 {
     LOG_FUNC_START();
+
+    if (is_initialized) {
+        deinit();
+    }
+
     /*
     stop();
 
@@ -175,7 +183,8 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
     audio_plugin_host.plugin_activate(device_sample_rate, BUFFER_SIZE);
     // audio_plugin_host.get_clap_info(clap_file_pathes);
 
-    is_processing = true;
+    is_initialized = true;
+    is_processing = true;       // 最後にtrueにする（trueにすることで別スレッドで処理が始まるので）
 
     godot::UtilityFunctions::print(std::format("DawEngine::init() end").c_str());
 
@@ -285,6 +294,8 @@ int DawEngine::init_audio()
         ma_device_uninit(&device);
         return -5;
     }
+
+    is_audio_init_success = true;
 
     godot::UtilityFunctions::print(std::format("miniaudio Initialising all successed.").c_str());
 
@@ -432,9 +443,10 @@ int DawEngine::init_midi()
         message[2] = 40;
         midiout->sendMessage( &message );
         */
+        is_midi_init_success = true;
     }
 
-    godot::UtilityFunctions::print(std::format("init_midi_device() end").c_str());
+    godot::UtilityFunctions::print(std::format("init_midi_device() success end").c_str());
 
     return 0;
 }
@@ -447,8 +459,18 @@ int DawEngine::deinit()
     godot::UtilityFunctions::print(std::format("DawEngine::deinit() start").c_str());
     audio_plugin_host.deinit();
 
-    deinit_midi();
-    deinit_audio();
+    if (is_midi_init_success)
+    {
+        deinit_midi();
+        is_midi_init_success = false;
+    }
+
+    if (is_audio_init_success) {
+        deinit_audio();
+        is_audio_init_success = false;
+    }
+
+    is_initialized = false;
 
     godot::UtilityFunctions::print(std::format("DawEngine::deinit() end").c_str());
     LOG_FUNC_END();
