@@ -23,9 +23,8 @@ thread_local ThreadType g_thread_type = ThreadType::Unknown;
 
 AudioPluginHost::AudioPluginHost()
 {
-    godot::UtilityFunctions::print("AudioPluginHost() start");
-    spdlog::trace(__FUNCTION__);
     LOG_FUNC_START();
+    godot::UtilityFunctions::print("AudioPluginHost() start");
 
     g_thread_type = ThreadType::MainThread;
     // オーディオバッファの初期化
@@ -38,19 +37,20 @@ AudioPluginHost::AudioPluginHost()
     outputs[1] = &outputBuffer[BUFFER_SIZE];
     */
     godot::UtilityFunctions::print("AudioPluginHost() end");
-    spdlog::trace("{} end", __FUNCTION__);
+    LOG_FUNC_END();
 }
 
 AudioPluginHost::~AudioPluginHost()
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("AudioPluginHost::~AudioPluginHost start");
-      spdlog::trace(__FUNCTION__);
-      spdlog::trace("{} end", __FUNCTION__);
     godot::UtilityFunctions::print("AudioPluginHost::~AudioPluginHost end");
+    LOG_FUNC_END();
 }
 
 int AudioPluginHost::init()
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("AudioPluginHost::init() start");
     // init_clap_plugin();
     godot::UtilityFunctions::print("AudioPluginHost::init() end");
@@ -60,6 +60,7 @@ int AudioPluginHost::init()
 
 int AudioPluginHost::init_clap_plugin(std::vector<std::filesystem::path> &clap_file_pathes)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print(std::format("init_clap_plugin() start").c_str());
 
     Json::Value &root = clap_info_doc.root;
@@ -311,6 +312,7 @@ int AudioPluginHost::init_clap_plugin(std::vector<std::filesystem::path> &clap_f
 
 Json::Value AudioPluginHost::get_loaded_plugin_params_json()
 {
+    LOG_FUNC_START();
     if (false) {
     }
 
@@ -319,6 +321,7 @@ Json::Value AudioPluginHost::get_loaded_plugin_params_json()
 
 Json::Value AudioPluginHost::get_plugin_params_json(const clap_plugin_t *inst)
 {
+    LOG_FUNC_START();
     //std::cout << json["param-info"].toStyledString() << std::endl;
 
 
@@ -395,15 +398,17 @@ Json::Value AudioPluginHost::get_plugin_params_json(const clap_plugin_t *inst)
 
 CLAPInfoJsonRoot& AudioPluginHost::get_clap_plugin_info()
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("get_clap_plugin_info() start");
+
+    LOG_FUNC_END();
 
     return clap_info_doc;
 }
 
 void AudioPluginHost::plugin_activate(int32_t sample_rate, int32_t blockSize)
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START();
 
     if (!clap_plugin)
         return;
@@ -419,22 +424,26 @@ void AudioPluginHost::plugin_activate(int32_t sample_rate, int32_t blockSize)
         godot::UtilityFunctions::print(std::format("Unable to start_processing plugin").c_str());
         return;
     }
+    
+    LOG_FUNC_END();
 }
 
 int AudioPluginHost::deinit()
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("AudioPluginHost::deinit() start");
-    spdlog::trace(__FUNCTION__);
 
     deinit_clap_plugin();
 
     godot::UtilityFunctions::print("AudioPluginHost::deinit() end");
 
+    LOG_FUNC_END();
     return 0;
 }
 
 int AudioPluginHost::deinit_clap_plugin()
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("AudioPluginHost::deinit_clap_plugin() start");
 
     auto &plugin = clap_plugin;
@@ -465,12 +474,14 @@ int AudioPluginHost::deinit_clap_plugin()
 
     godot::UtilityFunctions::print("AudioPluginHost::deinit_clap_plugin() end");
 
+    LOG_FUNC_END();
     return 0;
 }
 
 int AudioPluginHost::plugin_process(const float *audio_in, float *audio_out, int frame_count, double stream_time)
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START();
+
     // godot::UtilityFunctions::print("AudioPluginHost::plugin_process() start");
 
     // godot::UtilityFunctions::print(std::format("buffer_size:  {}, {}", frame_count, BUFFER_SIZE).c_str());
@@ -614,19 +625,19 @@ int AudioPluginHost::plugin_process(const float *audio_in, float *audio_out, int
     _event_out.clear();
 
     // godot::UtilityFunctions::print("AudioPluginHost::plugin_process() end");
+    LOG_FUNC_END();
 
     return 0;
 }
 
 int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START_DEBUG("offset:{} ch:{} key:{} vel:{}", sample_offset, event.channel, event.key, event.velocity);
 
     auto& daw_ev = event;
 
     godot::UtilityFunctions::print( std::format("AudioPluginHost::process_note_on() start: {} {} {} {}", sample_offset, event.channel, event.key, event.velocity).c_str() );
-    spdlog::trace("{} {} {} {} {}", __FUNCTION__, sample_offset, event.channel, event.key, event.velocity);
-    // checkForAudioThread();
+  // checkForAudioThread();
 
 /*
     公式ではどちらかというとCLAP_EVENT_NOTE_推奨らしい
@@ -667,7 +678,7 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
 
     note_id++;
 
-    spdlog::trace("{} end", __FUNCTION__);
+    LOG_FUNC_END();
     godot::UtilityFunctions::print("AudioPluginHost::process_note_on() end");
 
     return 0;
@@ -675,10 +686,9 @@ int AudioPluginHost::process_note_on(int sample_offset, daw_event_t &event)
 
 int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START_DEBUG("offset:{} ch:{} key:{} vel:{}", sample_offset, event.channel, event.key, event.velocity);
 
     godot::UtilityFunctions::print( std::format("AudioPluginHost::process_note_off() start: {} {} {} {}", sample_offset, event.channel, event.key, event.velocity).c_str() );
-    spdlog::trace("{} {} {} {} {}", __FUNCTION__, sample_offset, event.channel, event.key, event.velocity);
 
     auto& daw_ev = event;
     //godot::UtilityFunctions::print( std::format("AudioPluginHost::process_note_off() start: {} {} {} {}", sample_offset, channel, key, velocity).c_str() );
@@ -719,7 +729,7 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
 
     //note_id++;
 
-    spdlog::trace("{} end", __FUNCTION__);
+    LOG_FUNC_END();
     godot::UtilityFunctions::print("AudioPluginHost::process_note_off() end");
 
     return 0;
@@ -727,10 +737,9 @@ int AudioPluginHost::process_note_off(int sample_offset, daw_event_t &event)
 
 int AudioPluginHost::process_param_change(int sample_offset, daw_event_t &event)
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START_DEBUG("offset:{} ch:{} key:{} vel:{}", sample_offset, event.channel, event.key, event.velocity);
 
     godot::UtilityFunctions::print( std::format("AudioPluginHost::process_param_change() start: {}", sample_offset).c_str() );
-    spdlog::trace("{} {} {} {} {}", __FUNCTION__, sample_offset, event.channel, event.key, event.velocity);
 
     auto& daw_ev = event;
     //CLAP_EVENT_PARAM_VALUE:
@@ -754,7 +763,7 @@ int AudioPluginHost::process_param_change(int sample_offset, daw_event_t &event)
 
     _event_in.push(&ev.header);
 
-    spdlog::trace("{} end", __FUNCTION__);
+    LOG_FUNC_END();
     godot::UtilityFunctions::print( std::format("AudioPluginHost::process_param_change() end").c_str() );
     return 0;
 }
@@ -763,6 +772,7 @@ int AudioPluginHost::process_param_change(int sample_offset, daw_event_t &event)
 // 特にDawEngineから渡されるinputs、チャンネル数とかを設定している
 void AudioPluginHost::set_ports(int num_inputs, float **inputs, int num_outputs, float **outputs)
 {
+    LOG_FUNC_START();
     auto &in = input_clap_audio_buffer;
     auto &out = output_clap_audio_buffer;
 
@@ -781,7 +791,7 @@ void AudioPluginHost::set_ports(int num_inputs, float **inputs, int num_outputs,
 
 int AudioPluginHost::get_clap_info(std::vector<std::filesystem::path> &sp)
 {
-    spdlog::trace(__FUNCTION__);
+    LOG_FUNC_START();
     godot::UtilityFunctions::print(std::format("get_clap_info() start").c_str());
 
     Json::Value res;
@@ -866,6 +876,7 @@ int AudioPluginHost::get_clap_info(std::vector<std::filesystem::path> &sp)
     }
 
     godot::UtilityFunctions::print(std::format("get_clap_info() end").c_str());
+    LOG_FUNC_END();
     // doc.root["result"] = res;
     return 0;
 }

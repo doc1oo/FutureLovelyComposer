@@ -8,6 +8,9 @@
 #define LOG_FUNC_START(X, ...) \
     spdlog::trace("{}() start " X, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
 
+#define LOG_FUNC_START_DEBUG(X, ...) \
+    spdlog::debug("{}() start " X, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+
 #define LOG_FUNC_END(X, ...) \
     spdlog::trace("{}() end " X, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
 

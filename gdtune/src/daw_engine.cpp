@@ -84,6 +84,7 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
 
 DawEngine::DawEngine() : is_processing(false)
 {
+    LOG_FUNC_START();
     // DAWオーディオバッファの初期化
     daw_audio_input_buffer.resize(BUFFER_SIZE * 2); // ステレオ
     daw_audio_output_buffer.resize(BUFFER_SIZE * 2);
@@ -103,6 +104,7 @@ DawEngine::DawEngine() : is_processing(false)
 
 DawEngine::~DawEngine()
 {
+    LOG_FUNC_START();
     /*
     stop();
 
@@ -119,6 +121,7 @@ DawEngine::~DawEngine()
 
 int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print(std::format("DawEngine::init() start").c_str());
 
     if (plugin_dir != "")
@@ -181,6 +184,7 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
 
 int DawEngine::init_audio()
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print(std::format("init_audio_device() start").c_str());
 
     const bool ENABLE_WASAPI_LOW_LATENCY_MODE = false;
@@ -289,6 +293,7 @@ int DawEngine::init_audio()
 
 int DawEngine::init_midi()
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print(std::format("init_midi_device() start").c_str());
 
     godot::UtilityFunctions::print(std::format("RtMidiIn construct").c_str());
@@ -436,6 +441,7 @@ int DawEngine::init_midi()
 
 int DawEngine::deinit()
 {
+    LOG_FUNC_START();
     is_processing = false;
 
     godot::UtilityFunctions::print(std::format("DawEngine::deinit() start").c_str());
@@ -445,11 +451,13 @@ int DawEngine::deinit()
     deinit_audio();
 
     godot::UtilityFunctions::print(std::format("DawEngine::deinit() end").c_str());
+    LOG_FUNC_END();
     return 0;
 }
 
 int DawEngine::deinit_audio()
 {
+    LOG_FUNC_START();
 
     // --------------------------------------------------------------------
     godot::UtilityFunctions::print("Closing audio device start.");
@@ -470,11 +478,13 @@ int DawEngine::deinit_audio()
 
     godot::UtilityFunctions::print("Closing audio device finished.");
 
+    LOG_FUNC_END();
     return 0;
 }
 
 int DawEngine::deinit_midi()
 {
+    LOG_FUNC_START();
 
     // --------------------------------------------------------------------
     godot::UtilityFunctions::print("Closing midi device start.");
@@ -492,11 +502,13 @@ int DawEngine::deinit_midi()
     }
 
     godot::UtilityFunctions::print("Closing midi device finished.");
+    LOG_FUNC_END();
     return 0;
 }
 
 bool DawEngine::load_plugin(const char *path)
 {
+    LOG_FUNC_START();
     /*
     library = dlopen(path, RTLD_LOCAL | RTLD_LAZY);
     if (!library) {
@@ -546,6 +558,7 @@ bool DawEngine::load_plugin(const char *path)
 
 bool DawEngine::start()
 {
+    LOG_FUNC_START();
     /*
     if (!plugin) {
         std::cerr << "No plugin loaded" << std::endl;
@@ -568,6 +581,7 @@ bool DawEngine::start()
 
 void DawEngine::stop()
 {
+    LOG_FUNC_START();
     /*
     isProcessing = false;
     if (plugin) {
@@ -580,6 +594,7 @@ void DawEngine::stop()
 
 int DawEngine::update(double delta)
 {
+    LOG_FUNC_START();
 
     // エディタで実行されているかを確認し、エディタ内では開始処理をしない
     // if (godot::Engine::get_singleton()->is_editor_hint()) {
@@ -703,12 +718,13 @@ int DawEngine::update(double delta)
     }
     */
 
+    LOG_FUNC_END();
     return 0;
 }
 
 void DawEngine::process_audio(const float *input, float *output, uint32_t frame_count, double stream_time)
 {
-
+    LOG_FUNC_START();
     // godot::UtilityFunctions::print(std::format("DawEngine::process_audio() start").c_str() );
     /*
      if (!audio_plugin_host || !isProcessing)
@@ -758,15 +774,18 @@ void DawEngine::process_audio(const float *input, float *output, uint32_t frame_
         }
         */
     // godot::UtilityFunctions::print(std::format("DawEngine::process_audio() end").c_str() );
+    LOG_FUNC_END();
 }
 
 void DawEngine::set_plugin_directory(std::string plugin_dir)
 {
+    LOG_FUNC_START();
     plugin_dir_path = plugin_dir;
 }
 
 void DawEngine::play_note(int key, double length, int velocity, int channel, double delay_time)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("DawEngine::play_note(() start");
 
     if (!is_processing)
@@ -788,6 +807,7 @@ void DawEngine::play_note(int key, double length, int velocity, int channel, dou
 
 int DawEngine::add_note_on(uint64_t event_time, int key, int velocity, int channel)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("DawEngine::add_note_on() start");
     // checkForAudioThread();
 
@@ -807,6 +827,7 @@ int DawEngine::add_note_on(uint64_t event_time, int key, int velocity, int chann
 
 int DawEngine::add_note_off(uint64_t event_time, int key, int velocity, int channel)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("DawEngine::add_note_off() start");
     // checkForAudioThread();
 
@@ -826,6 +847,7 @@ int DawEngine::add_note_off(uint64_t event_time, int key, int velocity, int chan
 
 int DawEngine::add_param_change_by_id(int param_id, double value, int channel, double delay_time)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("DawEngine::add_param_change_by_id() start");
 
     uint64_t start_frame = total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
@@ -849,6 +871,7 @@ int DawEngine::add_param_change_by_id(int param_id, double value, int channel, d
 
 int DawEngine::add_param_change(godot::String name, double value, int channel, double delay_time)
 {
+    LOG_FUNC_START();
     godot::UtilityFunctions::print("DawEngine::add_param_change() start");
     std::string cstring_name = name.utf8().get_data();
 
@@ -895,6 +918,7 @@ int DawEngine::add_param_change(godot::String name, double value, int channel, d
 
 std::string DawEngine::get_clap_plugin_info()
 {
+    LOG_FUNC_START();
     auto &info = audio_plugin_host.get_clap_plugin_info();
 
     std::string json_str = Json::FastWriter().write(info.root);
@@ -913,6 +937,7 @@ std::string DawEngine::get_clap_plugin_info()
 
 void DawEngine::extract_upcoming_events()
 {
+    LOG_FUNC_START();
     // godot::UtilityFunctions::print("extract_upcoming_events() start");
 
     uint64_t start_frame = total_frames_processed;
@@ -966,5 +991,6 @@ void DawEngine::extract_upcoming_events()
     std::erase_if(_daw_events, [](daw_event_t ev)
                   { return ev.erace_flag; });
 
+    LOG_FUNC_END();
     // godot::UtilityFunctions::print("extract_upcoming_events() end");
 }

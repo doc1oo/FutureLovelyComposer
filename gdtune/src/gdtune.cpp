@@ -24,6 +24,7 @@ namespace godot
       auto console = spdlog::stdout_color_mt("console");
       #define LOG_FUNC(console) console->info(__FUNCTION__)
 
+
       UtilityFunctions::print("-----------------------------------------------");
       UtilityFunctions::print("GDTune() Construct start!");
       // time_passed = 0;
@@ -55,6 +56,7 @@ namespace godot
    // GDExtentionのデストラクタ
    GDTune::~GDTune()
    {
+      LOG_FUNC_START();
       // エディタで実行されているかを確認し、エディタ内では開始処理をしない
       if (godot::Engine::get_singleton()->is_editor_hint())
       {
@@ -71,6 +73,7 @@ namespace godot
 
    void GDTune::init(godot::String plugin_dir, godot::String plugin_filename)
    {
+      LOG_FUNC_START();
       std::string plugin_dir_str = std::string(plugin_dir.utf8().get_data());
       std::string plugin_filename_str = std::string(plugin_filename.utf8().get_data());
       
@@ -79,6 +82,7 @@ namespace godot
 
    void GDTune::deinit()
    {
+      LOG_FUNC_START();
       daw_engine.deinit();
    }
 
@@ -119,6 +123,7 @@ namespace godot
    // デモ用の移動処理
    void GDTune::process_movement(double_t delta)
    {
+      LOG_FUNC_START();
       m_Velocity = Vector2(0.0f, 0.0f);
       Input &intutSingleton = *Input::get_singleton();
 
@@ -147,6 +152,7 @@ namespace godot
 
    godot::String GDTune::get_instruments_info()
    {
+      LOG_FUNC_START();
       auto json_str = daw_engine.get_clap_plugin_info();
       godot::String godot_json_str = godot::String(json_str.c_str());
       return godot_json_str;
@@ -154,6 +160,7 @@ namespace godot
 
    godot::String GDTune::get_loaded_plugin_params_json()
    {
+      LOG_FUNC_START();
       std::cout << "get_loaded_plugin_params_json() start " << std::endl;
 
       std::cout << daw_engine.loaded_plugin_params_json << std::endl;
@@ -169,6 +176,7 @@ namespace godot
    // GDExtensionノードとしての外部から利用できるAPIの登録
    void GDTune::_bind_methods()
    {
+      LOG_FUNC_START();
       UtilityFunctions::print("Binding methods start.");
 
       ClassDB::bind_method(D_METHOD("init", "plugin_dir", "plugin_filename"), &GDTune::init);
