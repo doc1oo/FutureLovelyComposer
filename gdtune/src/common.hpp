@@ -5,6 +5,12 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
+#define LOG_FUNC_START(X, ...) \
+    spdlog::trace("{}() start " X, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+
+#define LOG_FUNC_END(X, ...) \
+    spdlog::trace("{}() end " X, __FUNCTION__ __VA_OPT__(,) __VA_ARGS__)
+
 #define DEVICE_FORMAT ma_format_f32
 #define DEVICE_CHANNELS 2
 #define DEVICE_SAMPLE_RATE 48000

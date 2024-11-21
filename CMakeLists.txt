@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.19)
 project(gdextension-gdtune VERSION 0.0.1)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_VERBOSE_MAKEFILE 1)             # ビルド時に詳細な情報を表示する makeのコマンドにVERBOSE=1を付けるのと同じ
+
+add_compile_options(/std:c++23)
+add_compile_options(/Zc:preprocessor)       # マクロでの VA_OPT の使用には '/Zc:preprocessor' が必要です (VisualStudio warning C5109)
+add_definitions(-D_HAS_CXX23=1)
 
 #set(CMAKE_CXX_EXTENSIONS OFF)
 # Enable on Release build ----------------------------------

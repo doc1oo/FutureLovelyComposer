@@ -93,11 +93,12 @@ namespace godot
    // 60Hzを超えて可能な限り高速にくりかえし呼んで欲しい更新処理
    void GDTune::update(double_t delta)
    {
-      spdlog::trace("{}() start", __FUNCTION__);
+      //spdlog::trace(__FUNCTION__);
+      LOG_FUNC_START();
 
       daw_engine.update(0.0);
 
-      spdlog::trace("{}() end", __FUNCTION__);
+      LOG_FUNC_END();
    }
 
    void GDTune::play_note(int key, double length, int velocity, int channel, double delay_time)
