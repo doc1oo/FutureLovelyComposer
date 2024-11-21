@@ -31,8 +31,8 @@ func _ready():
 	
 	mutex = Mutex.new()
 	gdtune = GDTune.new()
-	#gdtune.init("","")
-	gdtune.init("C:/Program Files/Common Files/CLAP/","my_clap-saw-demo-imgui.clap")
+	gdtune.init("","")
+	#gdtune.init("C:/Program Files/Common Files/CLAP/","my_clap-saw-demo-imgui.clap")
 	
 	gdtune.param_change("Resonance", 1.0, 0, 0.0)
 	#gdtune.param_change("Amplitude Attack (s)", 1.0, 0, 0.0)
