@@ -36,17 +36,18 @@ void data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uin
         daw_engine->extract_upcoming_events();
 
         daw_engine->process_audio(static_cast<const float *>(pInput), static_cast<float *>(pOutput), frameCount, streamTime);
-    }
 
-    // std::cout << frameCount << std::endl; 1024とか
+        // std::cout << frameCount << std::endl; 1024とか
 
-    for (int i = 0; i < frameCount; i++)
-    {
-        // ma_int16* output = (ma_int16*)pOutput;
-        ma_float *output = (ma_float *)pOutput;
+        // Output sound
+        for (int i = 0; i < frameCount; i++)
+        {
+            // ma_int16* output = (ma_int16*)pOutput;
+            ma_float *output = (ma_float *)pOutput;
 
-        output[i * 2 + 0] = daw_engine->daw_audio_output_buffer[i];               // 左チャンネル
-        output[i * 2 + 1] = daw_engine->daw_audio_output_buffer[i + BUFFER_SIZE]; // 右チャンネル
+            output[i * 2 + 0] = daw_engine->daw_audio_output_buffer[i];               // 左チャンネル
+            output[i * 2 + 1] = daw_engine->daw_audio_output_buffer[i + BUFFER_SIZE]; // 右チャンネル
+        }
     }
 
     daw_engine->total_frames_processed += frameCount;
@@ -151,8 +152,8 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
     path_str += clap_file_name;
     clap_file_pathes.push_back(std::filesystem::path(path_str));
 
-    device_open_result = init_audio();
     init_midi();
+    device_open_result = init_audio();
 
     audio_plugin_host.init();
 
@@ -161,9 +162,30 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
     loaded_plugin_params_json = audio_plugin_host.get_loaded_plugin_params_json();
 
     auto num = loaded_plugin_params_json["param-count"].asUInt();
-    std::cout << loaded_plugin_params_json["param-info"].toStyledString() << std::endl;
-
     godot::UtilityFunctions::print(std::format("Plugin parameter num: {}", num).c_str());
+    //std::cout << loaded_plugin_params_json["param-info"].toStyledString() << std::endl;
+
+    {
+        // JSONライターを設定
+        Json::StreamWriterBuilder builder;
+        builder["commentStyle"] = "None";
+        builder["indentation"] = "    "; // 4スペースのインデント
+
+        // ファイルストリームを開く
+        std::ofstream outputFile("loaded_plugin_params_json.json");     // godot_project/に生成される
+        if (!outputFile.is_open()) {
+            std::cerr << "ファイルを開けませんでした" << std::endl;
+            return 1;
+        }
+
+        // JSONをファイルに書き出す
+        std::unique_ptr<Json::StreamWriter> writer(builder.newStreamWriter());
+        writer->write(loaded_plugin_params_json, &outputFile);
+
+        outputFile.close();
+    }
+
+    /*
     godot::UtilityFunctions::print(std::format("Plugin parameters ----------").c_str());
     for (int i = 0; i < num; i++)
     {
@@ -172,7 +194,7 @@ int DawEngine::init(std::string plugin_dir, std::string plugin_filename)
         // json["param-info"][i]["name"];
 
         godot::UtilityFunctions::print(std::format("[{}] ... current={} default={} min={} max={}", prm["name"].asString(), prm["values"]["current"].asString(), prm["values"]["default"].asString(), prm["values"]["min"].asString(), prm["values"]["max"].asString()).c_str());
-    }
+    }*/
 
     _inputs[0] = &daw_audio_input_buffer[0];
     _inputs[1] = &daw_audio_input_buffer[BUFFER_SIZE];

@@ -871,7 +871,7 @@ int AudioPluginHost::get_clap_info(std::vector<std::filesystem::path> &sp)
                 std::cerr << "Failed to unload DLL" << std::endl;
             }
 
-            godot::UtilityFunctions::print(std::format("clap info(): {}", entryJson.toStyledString()).c_str());
+            //godot::UtilityFunctions::print(std::format("clap info(): {}", entryJson.toStyledString()).c_str());
         }
     }
 

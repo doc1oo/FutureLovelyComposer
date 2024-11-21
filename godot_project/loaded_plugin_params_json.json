@@ -1,0 +1,137 @@
+{
+    "implemented" : true,
+    "param-count" : 10,
+    "param-info" : 
+    [
+        {
+            "flags" : [ "stepped", "auto" ],
+            "id" : 1378,
+            "module" : "Oscillator",
+            "name" : "Unison Count",
+            "values" : 
+            {
+                "current" : 3.0,
+                "default" : 3.0,
+                "max" : 7.0,
+                "min" : 1.0
+            }
+        },
+        {
+            "flags" : [ "auto", "mod", "mod-noteid", "mod-key" ],
+            "id" : 2391,
+            "module" : "Oscillator",
+            "name" : "Unison Spread in Cents",
+            "values" : 
+            {
+                "current" : 10.0,
+                "default" : 10.0,
+                "max" : 100.0,
+                "min" : 0.0
+            }
+        },
+        {
+            "flags" : [ "auto", "mod", "mod-noteid", "mod-key" ],
+            "id" : 8675309,
+            "module" : "Oscillator",
+            "name" : "Oscillator Detuning (in cents)",
+            "values" : 
+            {
+                "current" : 0.0,
+                "default" : 0.0,
+                "max" : 200.0,
+                "min" : -200.0
+            }
+        },
+        {
+            "flags" : [ "auto" ],
+            "id" : 2874,
+            "module" : "Amplitude Envelope Generator",
+            "name" : "Amplitude Attack (s)",
+            "values" : 
+            {
+                "current" : 0.01,
+                "default" : 0.01,
+                "max" : 1.0,
+                "min" : 0.0
+            }
+        },
+        {
+            "flags" : [ "auto" ],
+            "id" : 728,
+            "module" : "Amplitude Envelope Generator",
+            "name" : "Amplitude Release (s)",
+            "values" : 
+            {
+                "current" : 0.20000000000000001,
+                "default" : 0.20000000000000001,
+                "max" : 1.0,
+                "min" : 0.0
+            }
+        },
+        {
+            "flags" : [ "stepped", "auto" ],
+            "id" : 1942,
+            "module" : "Amplitude Envelope Generator",
+            "name" : "Deactivate Amp Envelope",
+            "values" : 
+            {
+                "current" : 0.0,
+                "default" : 0.0,
+                "max" : 1.0,
+                "min" : 0.0
+            }
+        },
+        {
+            "flags" : [ "auto", "mod", "mod-noteid", "mod-key" ],
+            "id" : 87612,
+            "module" : "Filter",
+            "name" : "Pre Filter VCA",
+            "values" : 
+            {
+                "current" : 1.0,
+                "default" : 1.0,
+                "max" : 1.0,
+                "min" : 0.0
+            }
+        },
+        {
+            "flags" : [ "auto", "mod", "mod-noteid", "mod-key" ],
+            "id" : 17,
+            "module" : "Filter",
+            "name" : "Cutoff in Keys",
+            "values" : 
+            {
+                "current" : 69.0,
+                "default" : 69.0,
+                "max" : 127.0,
+                "min" : 1.0
+            }
+        },
+        {
+            "flags" : [ "auto", "mod", "mod-noteid", "mod-key" ],
+            "id" : 94,
+            "module" : "Filter",
+            "name" : "Resonance",
+            "values" : 
+            {
+                "current" : 0.69999999999999996,
+                "default" : 0.69999999999999996,
+                "max" : 1.0,
+                "min" : 0.0
+            }
+        },
+        {
+            "flags" : [ "stepped", "auto" ],
+            "id" : 14255,
+            "module" : "Filter",
+            "name" : "Filter Type",
+            "values" : 
+            {
+                "current" : 0.0,
+                "default" : 0.0,
+                "max" : 5.0,
+                "min" : 0.0
+            }
+        }
+    ]
+}

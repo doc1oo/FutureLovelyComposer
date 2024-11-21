@@ -31,8 +31,8 @@ func _ready():
 	
 	mutex = Mutex.new()
 	gdtune = GDTune.new()
-	gdtune.init("","")
-	#gdtune.init("C:/Program Files/Common Files/CLAP/","my_clap-saw-demo-imgui.clap")
+	#gdtune.init("","")
+	gdtune.init("C:/Program Files/Common Files/CLAP/","my_clap-saw-demo-imgui.clap")
 	
 	gdtune.param_change("Resonance", 1.0, 0, 0.0)
 	#gdtune.param_change("Amplitude Attack (s)", 1.0, 0, 0.0)
@@ -72,7 +72,7 @@ func _ready():
 		var data_received = json.data
 		plug_info = json.get_data()
 		if typeof(plug_info) == TYPE_DICTIONARY:
-			print(plug_info) 
+			pass#print(plug_info) 
 		else:
 			print("Unexpected data")
 	else:
@@ -87,11 +87,11 @@ func _ready():
 	if result == OK:
 		params_info = json.get_data()
 		if typeof(params_info) == TYPE_DICTIONARY:
-			print(params_info) 
+			pass#print(params_info) 
 		else:
 			print("Unexpected data")
 	
-	print(params_info)
+	#print(params_info)
 
 	var label_settings = LabelSettings.new()
 	label_settings.font_size = 20
@@ -107,13 +107,13 @@ func _ready():
 
 	for i in range(params_info["param-count"]):
 		var prm = params_info["param-info"][i]
-		print(prm["name"]);
-		print(prm["id"]);
-		#print(prm["values"]);
-		print(prm["values"]["current"]);
-		print(prm["values"]["default"]);
-		print(prm["values"]["min"]);
-		print(prm["values"]["max"]);
+		#print(prm["name"]);
+		#print(prm["id"]);
+		#print(prm["values"]["current"]);
+		#print(prm["values"]["default"]);
+		#print(prm["values"]["min"]);
+		#print(prm["values"]["max"]);
+		
 		var slider = HSlider.new()
 		slider.set_position(Vector2(base_pos_x+300, i*30+base_pos_y))
 		slider.min_value = float(prm["values"]["min"])
@@ -121,7 +121,10 @@ func _ready():
 		slider.value = prm["values"]["current"]
 		slider.editable = true
 		slider.scrollable = true
-		slider.step = 0.01
+		if "stepped" in prm["flags"]:
+			slider.step = 1
+		else:
+			slider.step = 0.01
 		slider.size = Vector2(200, 30)
 		slider.visible = true
 		slider.top_level = true

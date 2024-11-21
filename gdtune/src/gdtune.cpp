@@ -18,7 +18,7 @@ namespace godot
    // GDExtentionのコンストラクタ
    GDTune::GDTune()
    {
-      spdlog::set_level(spdlog::level::trace);
+      spdlog::set_level(spdlog::level::debug);
       spdlog::info("spdlog/ GDTune() Construct start!");
 
       auto console = spdlog::stdout_color_mt("console");
@@ -156,21 +156,23 @@ namespace godot
       LOG_FUNC_START();
       auto json_str = daw_engine.get_clap_plugin_info();
       godot::String godot_json_str = godot::String(json_str.c_str());
+      LOG_FUNC_END();
+
       return godot_json_str;
    }
 
    godot::String GDTune::get_loaded_plugin_params_json()
    {
       LOG_FUNC_START();
-      std::cout << "get_loaded_plugin_params_json() start " << std::endl;
 
-      std::cout << daw_engine.loaded_plugin_params_json << std::endl;
+      //std::cout << daw_engine.loaded_plugin_params_json << std::endl;
       auto json_str = Json::FastWriter().write(daw_engine.loaded_plugin_params_json);
       auto s2 = json_str.c_str();
-      std::cout << "get_loaded_plugin_params_json: " << s2 << std::endl;
+      //std::cout << "get_loaded_plugin_params_json: " << s2 << std::endl;
       godot::String godot_json_str = godot::String(s2);
 
-      std::cout << "get_loaded_plugin_params_json() end " << std::endl;
+      LOG_FUNC_END();
+
       return godot_json_str;
    }
 
@@ -178,7 +180,7 @@ namespace godot
    void GDTune::_bind_methods()
    {
       LOG_FUNC_START();
-      UtilityFunctions::print("Binding methods start.");
+      UtilityFunctions::print("GDTune::_bind_methods() start - Binding methods start.");
 
       ClassDB::bind_method(D_METHOD("init", "plugin_dir", "plugin_filename"), &GDTune::init);
       ClassDB::bind_method(D_METHOD("deinit"), &GDTune::deinit);
@@ -199,7 +201,7 @@ namespace godot
       ADD_GROUP("GDTune", "movement_");
       ADD_PROPERTY(PropertyInfo(Variant::FLOAT, "movement_speed"), "set_speed", "get_speed");
 
-      UtilityFunctions::print("Binding methods finished.");
+      UtilityFunctions::print("GDTune::_bind_methods() end Binding methods finished.");
    }
 
 }
