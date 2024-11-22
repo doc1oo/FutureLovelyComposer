@@ -518,3 +518,8 @@ func _on_play_button_pressed() -> void:
 	pass # Replace with function body.
 	Globalv.play_state = not Globalv.play_state
 	pass # Replace with function body.
+
+
+func _on_play_speed_slider_value_changed(value: float) -> void:
+	Globalv.tempo_bpm = int(value)
+	pass # Replace with function body.
