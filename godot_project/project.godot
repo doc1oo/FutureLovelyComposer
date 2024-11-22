@@ -21,6 +21,10 @@ debug=false
 driver/driver="Dummy"
 driver/mix_rate=48000
 
+[autoload]
+
+Globalv="*res://globalv.gd"
+
 [debug]
 
 file_logging/enable_file_logging=true

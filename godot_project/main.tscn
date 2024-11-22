@@ -26,4 +26,12 @@ offset_right = 492.0
 offset_bottom = 495.0
 value = 50.0
 
+[node name="PlayButton" type="Button" parent="."]
+offset_left = 30.0
+offset_top = 443.0
+offset_right = 199.0
+offset_bottom = 474.0
+text = "Play"
+
 [connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]
+[connection signal="pressed" from="PlayButton" to="." method="_on_play_button_pressed"]

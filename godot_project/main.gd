@@ -19,15 +19,29 @@ var frequency = 440
 #call_deferred("add_child", gdtune)
 var thread_count = 0
 
+# pianoroll
+const bar_size_x:float = 340.0
+const bar_pos_x:int = 410
+var score_node_list:Array[Node] = []
+const pianoroll_width:int = 32
+const pianoroll_height:int = 16
+
 
 func _ready():
+	print("GDScript _ready() start")
 	#gdtune = GDTune.new()
 	#add_child(gdtune)
+	
+	Globalv.score.resize(64)
+	
+	
 	print("Godot Current Directory: " + OS.get_executable_path().get_base_dir())
 
 	var resource_root_path = ProjectSettings.globalize_path("res://")
 
 	get_tree().set_auto_accept_quit(false)	
+	
+	pianoroll_preparation()
 	
 	mutex = Mutex.new()
 	gdtune = GDTune.new()
@@ -160,18 +174,77 @@ func  _process(delta: float) -> void:
 	var t = lm_pos.y / 1000.0 
 
 	#gdtune.param_change("Resonance", 0.5*sin(t)*0.5, 0, 0.0)
+	update_score_display(delta)
 	
 	queue_redraw()
+
+func update_score_display(delta):
+	
+	var play_index = int(Globalv.play_count / Globalv.ticks_per_quarter_note) % Globalv.song_length
+	
+	for i in range(pianoroll_width):
+		for j in range(pianoroll_height):
+			var index = j + (i * pianoroll_height)
+			var sprite_name = "SCORERECT" + str(index)
+			if (Globalv.score[i]) == j:
+				score_node_list[index].get_node(sprite_name).modulate = Color(1.0, 0.0, 0.0, 1.0)
+			else:
+				if i == play_index:
+					score_node_list[index].get_node(sprite_name).modulate = Color(0.4, 0.7, 0.4, 1.0)	
+				else:
+					score_node_list[index].get_node(sprite_name).modulate = Color(0.5, 0.5, 0.5, 1.0)	
+
+	if Globalv.play_state == true:
+		print("play_count: " + str(Globalv.play_count))
+		var tick = Globalv.play_count % Globalv.ticks_per_quarter_note
+		if tick < Globalv.prev_tick:	# ノートを演奏
+
+			print("ticks_per_quarter_note ")
+			var key = 80 - Globalv.score[play_index%64]
+			if Globalv.prev_play_note != null:
+				pass#keyb_note_off(Globalv.prev_play_note)
+			#keyb_note_on(key)
+			gdtune.play_note(key, 0.2, 100, 0, 0.0)
+			Globalv.prev_play_note = key
+			print("play score note ")
+		
+		var beats_per_second = Globalv.tempo_bpm / 60
+		var rate_per_second = Globalv.ticks_per_quarter_note * beats_per_second
+
+		Globalv.prev_tick = tick
+
+		Globalv.play_count += int(rate_per_second * delta)		# BPM120で1秒間に2回480になるぺ～ス
+		Globalv.play_count %= rate_per_second * Globalv.song_length
+
+	# オーディオ再生時間とミックスにかかった時間を計算します。
+	#var time = $"../AudioStreamPlayer".get_playback_position() + AudioServer.get_time_since_last_mix()
+	# 出力の遅延時間を取得して補正します
+	#time -= AudioServer.get_output_latency()
+	
+	#print(" AudioServer.get_output_latency(): ", AudioServer.get_output_latency(), "  ", $"../AudioStreamPlayer".get_playback_position(), "  ", AudioServer.get_time_since_last_mix(), "  ", time)
+
 
 func _input(event):
 	if event is InputEventMouseButton:
 		if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			
+			#_on_input_event($main, event, )
+			var mouse_pos = get_global_mouse_position()
+			var space = get_world_2d().direct_space_state
+			var query = PhysicsRayQueryParameters2D.create(mouse_pos, mouse_pos)
+			var result = space.intersect_ray(query)
+			
+			if result:
+				print("call _on_input_event")
+				#_on_input_event($main, event, result.get_meta("key") )
+				#return result.collider
+				
 			if gdtune:
 				var m_pos = get_global_mouse_position()
 				frequency = 1000 - m_pos.y
 				var note_key = frequency / 50 + 60
-				print("play_note:" + str(note_key))
-				gdtune.play_note(note_key, 1.0, 100, 0, 0.0)
+				#print("play_note:" + str(note_key))
+				#gdtune.play_note(note_key, 1.0, 100, 0, 0.0)
 		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
 			print("右クリックされました")
 			
@@ -362,4 +435,86 @@ func _on_h_slider_value_changed(value: float, slider: HSlider) -> void:
 	get_node("plugin_params_value_label_" + str(param_id)).text = str(value)
 	
 	gdtune.param_change_by_id(param_id, value, 0, 0.0)
+	pass # Replace with function body.
+
+
+func pianoroll_preparation()->void:
+	# LEDs for program indicator.
+	
+	var texture = load("res://art/sprite2.PNG") as Texture2D
+	
+	for i in range(pianoroll_width):
+		for j in range(pianoroll_height):
+			var index = j + i * pianoroll_height
+			var cell:Area2D = Area2D.new()
+			var sprite:Sprite2D = Sprite2D.new()
+			
+			cell.name = "CELL" + str(i) + "_" + str(j)
+			var grid_size = 20
+			#sprite.size = Vector2(grid_size-1,grid_size-1)
+			var x:int = i*grid_size +400
+			var y:int = j*grid_size+400
+			var col = 0.5 + (i%2)/10.0
+			cell.set_meta("index", i)
+			cell.set_meta("key", j)
+			
+			sprite.name = "SCORERECT" + str(index)
+			
+			#sprite.color = Color(col, col, col, 1)
+			sprite.modulate = Color(col, col, col, 1)
+			sprite.position = Vector2(x,y)
+			sprite.texture = texture#ImageTexture.new()
+			#sprite.texture.set("res://art/sprite2.PNG", 0)
+			sprite.region_enabled = true
+			sprite.region_rect = Rect2(0, 0, 16, 16)		# テクスチャのソース座標
+			
+			sprite.visible = true
+			#cell.owner = self
+			var collision = CollisionShape2D.new()
+			var shape:RectangleShape2D = RectangleShape2D.new()
+			shape.size = Vector2(grid_size-1,grid_size-1)
+			collision.set_shape(shape)
+			#get_node("LED"+str(index)).add_child(collision[index])
+			collision.position = Vector2(x, y)
+
+			cell.input_event.connect(_on_input_event.bind(cell))
+			#sprite.set_mouse_filter(Control.MOUSE_FILTER_IGNORE)
+			#cell.connect(_on_input_event)
+			cell.add_child(sprite)
+			cell.add_child(collision)
+
+			score_node_list.append(cell)
+			add_child(cell)
+
+
+
+var is_pressed:bool = false
+var note:int
+
+func _on_input_event(viewport:Node, event:InputEvent , shape_idx:int, cell: Area2D)->void:
+	print("ScoreCellArea2D._on_input_event ", cell)
+	
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		print("ScoreCellArea2D if true")
+		print(viewport)
+		var instance_name = cell.name #get_name()
+		if instance_name.begins_with("CELL"):
+			print("ScoreCellArea2D isCell")
+			if 	event.pressed:
+				is_pressed = true
+				#note = int(instance_name.replace("CELL", ""))
+				note = cell.get_meta("key")
+				var index = cell.get_meta("index")
+				Globalv.score[index] = note
+				gdtune.play_note(80-note, 0.2, 100, 0, 0.0)
+				print("ScoreCellArea2D  keyb_note_on():" + str(note))
+			#else:
+			#	is_pressed = false
+			#	$"..".keyb_note_off(80-note)
+			#	print("ScoreCellArea2D  keyb_note_off()")
+
+
+func _on_play_button_pressed() -> void:
+	pass # Replace with function body.
+	Globalv.play_state = not Globalv.play_state
 	pass # Replace with function body.
