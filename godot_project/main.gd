@@ -33,7 +33,16 @@ func _ready():
 	#add_child(gdtune)
 	
 	Globalv.score.resize(64)
-	
+	Globalv.score = [
+		12,10,8,7,5,3,1,0,
+		16,16,16,16,16,16,16,16,
+		16,16,16,16,16,16,16,16,
+		16,16,16,16,16,16,16,16,
+		16,16,16,16,16,16,16,16,
+		16,16,16,16,16,16,16,16,
+		16,16,16,16,16,16,16,16,
+		16,16,16,16,16,16,16,16,		
+	]
 	
 	print("Godot Current Directory: " + OS.get_executable_path().get_base_dir())
 
