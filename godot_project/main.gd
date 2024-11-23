@@ -195,16 +195,16 @@ func update_score_display(delta):
 					score_node_list[index].get_node(sprite_name).modulate = Color(0.5, 0.5, 0.5, 1.0)	
 
 	if Globalv.play_state == true:
-		print("play_count: " + str(Globalv.play_count))
+		#print("play_count: " + str(Globalv.play_count))
 		var tick = Globalv.play_count % Globalv.ticks_per_quarter_note
 		if tick < Globalv.prev_tick:	# ノートを演奏
 
 			print("ticks_per_quarter_note ")
 			var key = 80 - Globalv.score[play_index%64]
 			if Globalv.prev_play_note != null:
-				pass#keyb_note_off(Globalv.prev_play_note)
-			#keyb_note_on(key)
-			gdtune.play_note(key, 0.2, 100, 0, 0.0)
+				gdtune.add_note_off(Globalv.prev_play_note, 100, 0, 0)
+			gdtune.add_note_on(key, 100, 0, 0)
+			#gdtune.play_note(key, 0.2, 100, 0, 0.0)
 			Globalv.prev_play_note = key
 			print("play score note ")
 		

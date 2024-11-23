@@ -91,6 +91,8 @@ namespace godot
 
     void update(double_t delta);
     void play_note(int key, double length, int velocity, int channel, double delay_time);
+    void add_note_on(int key, int velocity, int channel, double delay_time);
+    void add_note_off(int key, int velocity, int channel, double delay_time);
     void param_change(godot::String name, double value, int channel, double delay_time);
     void param_change_by_id(int param_id, double value, int channel, double delay_time);
     void init(godot::String plugin_dir, godot::String plugin_filename);

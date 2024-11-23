@@ -111,6 +111,18 @@ namespace godot
       daw_engine.play_note(key, length, velocity, channel, delay_time);
    }
 
+   void GDTune::add_note_on(int key, int velocity, int channel, double delay_time)
+   {
+      auto t = daw_engine.total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
+      daw_engine.add_note_on(t, key, velocity, channel);
+   }
+
+   void GDTune::add_note_off( int key, int velocity, int channel, double delay_time)
+   {
+      auto t = daw_engine.total_frames_processed + int64_t(delay_time * SAMPLE_RATE);
+      daw_engine.add_note_off(t, key,  velocity, channel);
+   }
+
    void GDTune::param_change(godot::String name, double value, int channel, double delay_time)
    {
       daw_engine.add_param_change(name, value, channel, delay_time);
@@ -195,6 +207,8 @@ namespace godot
       ClassDB::bind_method(D_METHOD("get_loaded_plugin_params_json"), &GDTune::get_loaded_plugin_params_json);
 
       ClassDB::bind_method(D_METHOD("play_note", "key", "length", "velocity", "channel", "delay_time"), &GDTune::play_note);
+      ClassDB::bind_method(D_METHOD("add_note_on", "key", "velocity", "channel", "delay_time"), &GDTune::add_note_on);
+      ClassDB::bind_method(D_METHOD("add_note_off", "key", "velocity", "channel", "delay_time"), &GDTune::add_note_off);
       ClassDB::bind_method(D_METHOD("param_change", "name", "value", "channel", "delay_time"), &GDTune::param_change);
       ClassDB::bind_method(D_METHOD("param_change_by_id", "param_id", "value", "channel", "delay_time"), &GDTune::param_change_by_id);
 
